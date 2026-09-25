@@ -23,6 +23,9 @@ const SCHEMES = new Set(['bearer', 'basic', 'token', 'bot', 'ssws', 'apikey', 'a
 const PARAM_SCHEME = /^(?:digest|oauth|aws4-[\w-]+)$/;
 const PARAM = /(?<![\w-])([\w-]+)=(?:\\?"((?:(?!\\?")[^\r\n])*)\\?"|([^\s,"'\\]+))/dg;
 const SECRET_PARAM = /^(?:response|signature|oauth_signature|oauth_token|token)$/i;
+// Header APIs that don't write Name: value, such as setRequestHeader("Authorization", "Bearer …") or
+// name/value pairs, still put the scheme right before the credential.
+const SCHEME_ANYWHERE = new RegExp(String.raw`${START}(Bearer|Basic)[ \t]+`, 'gi');
 // curl's short flags take the value attached or after spaces; the long ones after = or spaces.
 const CURL_USER = /(?<!\S)(?:(-u|-U)[ \t]*|(--user|--proxy-user)(?:=|[ \t]+))(["']?)/g;
 const CURL_BEARER = /(?<!\S)--oauth2-bearer(?:=|[ \t]+)["']?/g;
@@ -30,8 +33,26 @@ const CURL_BEARER = /(?<!\S)--oauth2-bearer(?:=|[ \t]+)["']?/g;
 export const authorizationHeaders: Rule = {
   name: 'authorization-headers',
   by: 'context',
-  find: (text) => [...headers(text), ...curlUsers(text), ...curlBearers(text)],
+  find: (text) => [...headers(text), ...schemesAnywhere(text), ...curlUsers(text), ...curlBearers(text)],
 };
+
+// Gated, so prose such as "Bearer tokens expire" or "Basic auth is disabled" stays.
+function schemesAnywhere(text: string): Finding[] {
+  return [...text.matchAll(SCHEME_ANYWHERE)].flatMap((m) => {
+    const scheme = m[1]!.toLowerCase();
+    const accept = scheme === 'basic' ? isBasicCredential : looksLikeCredential;
+    return credential(text, m.index + m[0].length, scheme, `${m[1]} credential`, accept);
+  });
+}
+
+// Base64 of user:password.
+function isBasicCredential(value: string): boolean {
+  try {
+    return /^[A-Za-z\d+/]+=*$/.test(value) && atob(value).includes(':');
+  } catch {
+    return false;
+  }
+}
 
 function headers(text: string): Finding[] {
   return [...text.matchAll(HEADER)].flatMap((m) => {

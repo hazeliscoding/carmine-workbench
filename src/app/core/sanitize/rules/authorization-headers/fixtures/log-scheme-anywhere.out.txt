@@ -1,0 +1,6 @@
+request.addHeader("Authorization", "Bearer <bearer#1>");
+xhr.setRequestHeader('Authorization', 'Basic <basic#2>');
+httpx headers: [(b'authorization', b'Bearer <bearer#3>')]
+{"name":"Authorization","value":"Bearer <bearer#4>"}
+AUTH_HEADER="Bearer <bearer#5>"
+Bearer tokens expire after an hour and Basic auth is disabled; the bearer of a token can call the API.
