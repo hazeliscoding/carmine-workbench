@@ -1,0 +1,11 @@
+$ env | grep ORDERS
+ORDERS_DB_PASSWORD=<orders-db-password#1>
+ORDERS_API_TOKEN="<orders-api-token#2>"
+export STRIPE_WEBHOOK_SECRET='<stripe-webhook-secret#3>'
+ORDERS_DB_HOST=db.internal
+ORDERS_TOKEN_TTL=3600
+$ cat ~/.aws/credentials
+[default]
+aws_secret_access_key = <aws-secret-access-key#4>
+region = us-east-1
+07:19:02 INFO  login ok user=usr_034 password=<password#5> session_id=<session-id#6> max_tokens=1024

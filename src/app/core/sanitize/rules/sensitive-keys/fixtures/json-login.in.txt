@@ -1,0 +1,15 @@
+{
+  "username": "usr_034",
+  "password": "{{secret:correct horse battery staple}}",
+  "client_secret": "{{secret:7Fjfp0ZBr1KtDRbnfVdmIw}}",
+  "refreshToken": "{{secret:tGzv3JOkF0XG5Qx2TlKWIA}}",
+  "apiKey": "{{secret:3f9a8c2e1b7d4a60}}",
+  "webhook_secret": "{{secret:whk-2b7e1516-28ae-d2a6}}",
+  "passphrase": "{{secret:with \"escaped\" quotes}}",
+  "token_type": "Bearer",
+  "next_page_token": "b3JkZXJzOjUw",
+  "expires_in": 3600,
+  "remember_token": null,
+  "has_password": true,
+  "secret": {"name": "orders-db", "version": 3}
+}

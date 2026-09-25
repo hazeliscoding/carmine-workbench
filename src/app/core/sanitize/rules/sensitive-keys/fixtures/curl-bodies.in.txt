@@ -1,0 +1,8 @@
+curl https://auth.example.com/login \
+  --data-urlencode 'username=usr_034' \
+  --data-urlencode 'password={{secret:Tr0ub4dor-3}}'
+curl -X POST https://api.example.com/v1/login -H 'Content-Type: application/json' \
+  -d '{"email":"usr_034@example.com","password":"{{secret:hunter2-staging}}","mfa_token":"{{secret:492039}}"}'
+dotnet run --ConnectionStrings:Orders="Server=tcp:db.internal,1433;User ID=orders;Password={{secret:pg-s3cret-pass}};Encrypt=true"
+AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=ordersstore;AccountKey={{secret:FakeAccountKeyForFixtures0123456789+/==}};EndpointSuffix=core.windows.net"
+mysql --user=orders --password={{secret:my-s3cret-pass}} orders

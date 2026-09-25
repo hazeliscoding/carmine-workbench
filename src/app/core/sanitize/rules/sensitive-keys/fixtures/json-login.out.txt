@@ -1,0 +1,15 @@
+{
+  "username": "usr_034",
+  "password": "<password#1>",
+  "client_secret": "<client-secret#2>",
+  "refreshToken": "<refresh-token#3>",
+  "apiKey": "<api-key#4>",
+  "webhook_secret": "<webhook-secret#5>",
+  "passphrase": "<passphrase#6>",
+  "token_type": "Bearer",
+  "next_page_token": "b3JkZXJzOjUw",
+  "expires_in": 3600,
+  "remember_token": null,
+  "has_password": true,
+  "secret": {"name": "orders-db", "version": 3}
+}

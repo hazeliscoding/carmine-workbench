@@ -1,0 +1,9 @@
+database:
+  host: db.internal
+  password: <password#1>
+  pool: 5
+oauth:
+  client_id: orders-cli
+  client_secret: "<client-secret#2>"
+  token_url: https://auth.example.com/oauth/token
+spring.datasource.password=<password#3>

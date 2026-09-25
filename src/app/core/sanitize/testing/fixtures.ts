@@ -49,6 +49,7 @@ const FAKES: Record<string, (n: number) => string> = {
   // As it sits inside a JSON string, such as a Google service-account file: newlines escaped as \n.
   'private-key-json': (n) => pem('', n, '\\n'),
   'aws-access-key-id': (n) => 'AK' + 'IA' + chars(`aws${n}`, 16, UPPER + DIGITS),
+  'aws-secret-access-key': (n) => chars(`awss${n}`, 40, B64),
   'github-token': (n) => 'gh' + 'p_' + chars(`gh${n}`, 36),
   'stripe-key': (n) => ['sk', 'live', chars(`stripe${n}`, 24)].join('_'),
   'slack-token': (n) => ['xo' + 'xb', chars(`sa${n}`, 12, DIGITS), chars(`sb${n}`, 12, DIGITS), chars(`sc${n}`, 24)].join('-'),

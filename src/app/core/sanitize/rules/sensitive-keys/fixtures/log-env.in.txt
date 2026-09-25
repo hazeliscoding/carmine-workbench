@@ -1,0 +1,11 @@
+$ env | grep ORDERS
+ORDERS_DB_PASSWORD={{secret:pg-s3cret-pass}}
+ORDERS_API_TOKEN="{{secret:tok-8c1f0b2e9d7a}}"
+export STRIPE_WEBHOOK_SECRET='{{secret:whsec-fake-0123456789}}'
+ORDERS_DB_HOST=db.internal
+ORDERS_TOKEN_TTL=3600
+$ cat ~/.aws/credentials
+[default]
+aws_secret_access_key = {{fake:aws-secret-access-key}}
+region = us-east-1
+07:19:02 INFO  login ok user=usr_034 password={{secret:hunter2}} session_id={{secret:3b9d1f7a2c}} max_tokens=1024

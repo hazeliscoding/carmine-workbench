@@ -1,0 +1,9 @@
+database:
+  host: db.internal
+  password: {{secret:pg-s3cret-pass}}
+  pool: 5
+oauth:
+  client_id: orders-cli
+  client_secret: "{{secret:7Fjfp0ZBr1KtDRbnfVdmIw}}"
+  token_url: https://auth.example.com/oauth/token
+spring.datasource.password={{secret:sp-r1ng-pass-01}}
