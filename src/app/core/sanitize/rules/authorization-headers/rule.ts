@@ -26,15 +26,28 @@ const SECRET_PARAM = /^(?:response|signature|oauth_signature|oauth_token|token)$
 // Header APIs that don't write Name: value, such as setRequestHeader("Authorization", "Bearer …") or
 // name/value pairs, still put the scheme right before the credential.
 const SCHEME_ANYWHERE = new RegExp(String.raw`${START}(Bearer|Basic)[ \t]+`, 'gi');
-// curl's short flags take the value attached or after spaces; the long ones after = or spaces.
-const CURL_USER = /(?<!\S)(?:(-u|-U)[ \t]*|(--user|--proxy-user)(?:=|[ \t]+))(["']?)/g;
+// user:password flags of curl and HTTPie (-a, --auth). Short flags take the value attached or after
+// spaces; long ones after = or spaces.
+const CURL_USER = /(?<!\S)(?:(-u|-U|-a)[ \t]*|(--user|--proxy-user|--auth)(?:=|[ \t]+))(["']?)/g;
+// mysql takes its password attached to -p. Other tools use -p for a port, so only mysql and mariadb lines.
+const MYSQL_PASSWORD = /(?<!\S)-p(["']?)([^\s'"]+)\1/dg;
+const MYSQL = /\b(?:mysql|mariadb)\w*\b/;
 const CURL_BEARER = /(?<!\S)--oauth2-bearer(?:=|[ \t]+)["']?/g;
 
 export const authorizationHeaders: Rule = {
   name: 'authorization-headers',
   by: 'context',
-  find: (text) => [...headers(text), ...schemesAnywhere(text), ...curlUsers(text), ...curlBearers(text)],
+  find: (text) => [...headers(text), ...schemesAnywhere(text), ...curlUsers(text), ...curlBearers(text), ...mysqlPasswords(text)],
 };
+
+function mysqlPasswords(text: string): Finding[] {
+  return [...text.matchAll(MYSQL_PASSWORD)].flatMap((m) => {
+    const lineStart = text.lastIndexOf('\n', m.index) + 1;
+    if (!MYSQL.test(text.slice(lineStart, m.index))) return [];
+    const [start, end] = m.indices![2]!;
+    return [{ start, end, kind: 'password', reason: 'mysql -p password' }];
+  });
+}
 
 // Gated, so prose such as "Bearer tokens expire" or "Basic auth is disabled" stays.
 function schemesAnywhere(text: string): Finding[] {
@@ -97,7 +110,7 @@ function curlUsers(text: string): Finding[] {
     // docker and ps take -u uid:gid.
     if (!u || /^\d+:\d+$/.test(u[0])) return [];
     const [start, end] = u.indices![1]!;
-    return [{ start, end, kind: 'password', reason: `curl ${m[1] ?? m[2]} password` }];
+    return [{ start, end, kind: 'password', reason: `${m[1] ?? m[2]} password` }];
   });
 }
 

@@ -1,0 +1,6 @@
+http -a deploy:{{secret:hunter2-staging}} GET https://registry.example.com/v2/_catalog
+http --auth=ci:{{secret:Tr0ub4dor-3}} https://ci.example.com/api/json
+mysql -u root -p{{secret:my-s3cret-pass}} orders
+mysqldump --user=orders -p'{{secret:dump-pass-01}}' orders > orders.sql
+docker run -p 8080:80 -p8443:443 registry.example.com/orders:1.14.2
+ssh -p 2222 deploy@10.0.4.17
