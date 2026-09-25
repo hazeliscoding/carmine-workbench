@@ -1,0 +1,14 @@
+db:
+  password: |
+    {{secret:pg-s3cret-pass}}
+  host: db.internal
+oauth:
+  client_secret: >-
+    {{secret:7Fjfp0ZBr1KtDRbnfVdmIw}}
+  token_url: https://auth.example.com/oauth/token
+backup:
+  passphrase: |+
+    {{secret:first line of the phrase
+    and its second line}}
+
+  schedule: daily

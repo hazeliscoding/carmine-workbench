@@ -1,0 +1,13 @@
+db:
+  password: |
+    <password#1>
+  host: db.internal
+oauth:
+  client_secret: >-
+    <client-secret#2>
+  token_url: https://auth.example.com/oauth/token
+backup:
+  passphrase: |+
+    <passphrase#3>
+
+  schedule: daily

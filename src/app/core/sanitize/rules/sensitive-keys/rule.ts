@@ -24,6 +24,8 @@ const SENSITIVE =
 const NOT_SENSITIVE = /(?:tokentype|(?:next|page|continuation|pagination)token)$/;
 // A command-line flag with its value after a space, as in docker login --password …
 const FLAG = /(?<!\S)--([A-Za-z][\w-]*)[ \t]+(?=[^\s-])/g;
+// A YAML block scalar indicator (| or >, with optional chomping), the value on the lines below.
+const BLOCK = /[|>][+-]?[ \t]*(?=\r?\n)/y;
 
 export const sensitiveKeys: Rule = {
   name: 'sensitive-keys',
@@ -43,6 +45,8 @@ function valueOf(text: string, key: string, separator: string, from: number): Fi
   const kind = kindFromName(key.split('.').pop()!);
   const reason = `${key} value`;
 
+  BLOCK.lastIndex = at;
+  if (separator === ':' && BLOCK.test(text)) return blockValue(text, at, kind, reason);
   ESCAPED_QUOTED.lastIndex = at;
   QUOTED.lastIndex = at;
   const quoted = ESCAPED_QUOTED.exec(text) ?? QUOTED.exec(text);
@@ -58,4 +62,24 @@ function valueOf(text: string, key: string, separator: string, from: number): Fi
   // secret from somewhere else.
   if ((separator === ':' && /^-?\d+(?:\.\d+)?$/.test(bare)) || /[([]/.test(text[end] ?? '')) return [];
   return [{ start: at, end, kind, reason }];
+}
+
+// The lines after the key that are indented deeper than it, from the first content to the last.
+function blockValue(text: string, from: number, kind: string, reason: string): Finding[] {
+  const indentOf = (line: string) => /^[ \t]*/.exec(line)![0].length;
+  const keyLineStart = text.lastIndexOf('\n', from - 1) + 1;
+  const keyIndent = indentOf(text.slice(keyLineStart, from));
+  let start = -1;
+  let end = -1;
+  for (let pos = text.indexOf('\n', from) + 1; pos > 0 && pos < text.length; ) {
+    const next = text.indexOf('\n', pos);
+    const line = text.slice(pos, next === -1 ? text.length : next).replace(/\r$/, '');
+    if (line.trim()) {
+      if (indentOf(line) <= keyIndent) break;
+      if (start === -1) start = pos + indentOf(line);
+      end = pos + line.length;
+    }
+    pos = next + 1;
+  }
+  return start === -1 ? [] : [{ start, end, kind, reason }];
 }
