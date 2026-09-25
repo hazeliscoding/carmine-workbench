@@ -24,8 +24,8 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - [ ] Build a static Sanitize screen with a canned sample: findings list, input, sanitized output with diff, JWT panel, and a `LOCAL · NO NETWORK` status bar.
 - [ ] Turn on the privacy guardrails from the first commit:
   - [x] a Content Security Policy that blocks outbound connections;
-  - [ ] no HTTP or updater plugins;
-  - [ ] a CI check that fails on `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or `sendBeacon` in `src/`, and on HTTP crates in `src-tauri/`.
+  - [x] no HTTP or updater plugins;
+  - [x] a CI check that fails on `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or `sendBeacon` in `src/`, and on HTTP crates in `src-tauri/`.
 - [ ] Add a screenshot to the README.
 
 **Done when:** CI builds the app, the sample screen renders, and a test PR that adds `fetch(` fails the network check.
