@@ -1,0 +1,2 @@
+redirected to <https://app.example.com/cb?access_token=<access-token#1>>
+retrying with <access-token#1>

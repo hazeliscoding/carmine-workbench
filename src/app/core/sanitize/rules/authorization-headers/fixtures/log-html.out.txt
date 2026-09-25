@@ -1,3 +1,5 @@
 <p>Authorization: Bearer <bearer#1><br>Accept: */*</p>
 <pre>Authorization: Bearer <<jwt#2>></pre>
 X-Api-Key: <api-key#3>
+<Authorization: Bearer <bearer#4>> failed again with <bearer#4>
+[auth] <Basic <basic#5>>

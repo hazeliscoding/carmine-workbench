@@ -1,2 +1,4 @@
 <tr><td>password={{secret:hunter2-staging}}</td><td>next</td></tr>
 ADMIN_PASSWORD={{secret:x7K<q9!mZ>2pLw}}
+<kbd>password={{secret:hunter2-staging-2}}</kbd> then hunter2-staging-2
+token={{secret:Qx7mZp2Lk9vR4tW8yJ1}}> and later Qx7mZp2Lk9vR4tW8yJ1

@@ -1,2 +1,4 @@
 <tr><td>password=<password#1></td><td>next</td></tr>
 ADMIN_PASSWORD=<admin-password#2>
+<kbd>password=<password#3></kbd> then <password#3>
+token=<token#4>> and later <token#4>

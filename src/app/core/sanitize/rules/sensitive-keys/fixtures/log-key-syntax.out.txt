@@ -1,3 +1,4 @@
 DEBUG form: {'password': b'<password#1>', 'user': b'usr_034'}
 config = dict(api_token=f"<api-token#2>", region="eu-west-1")
 const token = `<token#3>`;
+07:19:02 WARN  token= <token#4>(retry)

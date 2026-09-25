@@ -3,14 +3,16 @@
 // or the 3D of %3D is never read as part of a token.
 export const START = String.raw`(?:(?<![\w\\%-])|(?<=\\[nrt]|%[\dA-Fa-f]{2}))`;
 
-// Where a bare value ends early: an HTML tag such as <br> or </td>, or a label from an earlier pass. Other
-// angle brackets can sit inside a password, so they don't end it.
-export const VALUE_STOP = String.raw`<\/?(?:a|b|i|p|br|hr|td|th|tr|li|ul|ol|em|div|pre|span|code|strong|table|tbody|thead|body|html|head)\b[^<>]*>|<[^<>\s]+#\d+>`;
+// Where a bare value ends early: a common HTML tag such as <br>, any closing tag, a label from an earlier
+// pass, or a < or > with no more value after it, as in <https://…?token=T>. Other angle brackets can sit
+// inside a password, so they don't end it.
+export const VALUE_STOP = String.raw`<(?:a|b|i|p|br|hr|td|th|tr|li|ul|ol|em|div|pre|span|code|strong|table|tbody|thead|body|html|head)\b[^<>]*>|<\/[A-Za-z][\w:.-]*>|<[^<>\s]+#\d+>|[<>](?=[\s'"\x60,;&(){}[\]\\<>]|$)`;
 
 // A bare identifier right before ( or [ is code that reads a secret, as in getToken() or os.environ["X"].
-// Tokens carry digits, so Bearer T(expired) still counts.
+// Tokens carry digits, so Bearer T(expired) still counts. Identifiers are mostly lowercase, while a random
+// run of letters is about half uppercase.
 export function isCallee(value: string): boolean {
-  return /^[A-Za-z_$.]+$/.test(value);
+  return /^[A-Za-z_$.]+$/.test(value) && value.replace(/[^A-Z]/g, '').length / value.length < 0.4;
 }
 
 // X- is a legacy header prefix that says nothing about the value.
