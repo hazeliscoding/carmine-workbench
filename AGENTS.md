@@ -21,7 +21,7 @@ The product's promise is only as good as these rules. Never break them, not even
 
 - Rules are plain TypeScript under `src/app/core/sanitize/`. They have no Angular imports and do no I/O. Only relative imports are allowed, and `fixtures.spec.ts` enforces this.
 - Each rule is one folder under `rules/`: `rule.ts` plus `fixtures/`. It is also listed in `rules/index.ts`.
-- A fixture case is `<case>.in.txt` plus `<case>.out.txt`. If there is no `.out.txt`, the input must come out unchanged: use that for false-positive guards. Start each case name with its input format: `curl-`, `http-`, `log-` or `json-`.
+- A fixture case is `<case>.in.txt` plus `<case>.out.txt`. If there is no `.out.txt`, the input must come out unchanged: use that for false-positive guards. Start each case name with its input format, such as `curl-`, `http-`, `log-`, `json-` or `yaml-`.
 - Every secret in an `.in.txt` is a placeholder. `{{secret:value}}` marks a literal. `{{fake:<format>}}` has `testing/fixtures.ts` build a vendor key, PEM block or JWT at test time, and `{{fake:<format>:2}}` builds a second one.
 - The runner checks every case:
   - **No leak:** no declared secret may appear in the output.
