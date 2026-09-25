@@ -1,0 +1,3 @@
+{"msg":"POST /login body={\"user\":\"usr_034\",\"password\":\"<password#1>\"}"}
+{"stdout":"DB_PASSWORD=<db-password#2>\nDB_HOST=db.internal\n"}
+{"msg":"env:\tpassword=<password#3>\tuser=usr_034"}

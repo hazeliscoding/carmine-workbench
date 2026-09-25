@@ -1,13 +1,17 @@
 import { Rule } from '../../types';
 import { kindFromName } from '../shared';
 
-// A key, optionally quoted or written as a --flag, then an assignment: = : := or =>. An = followed by
-// another = is a comparison, and a name right after ${ is a shell default such as ${TOKEN:-unset}.
-const KEY = /(?<![\w.$-])(?<!\$\{)(?:--)?(["']?)([A-Za-z_][\w.-]*)\1[ \t]*(:=|=>|:|=(?!=))[ \t]*/g;
+// A key, optionally quoted (escaped when the JSON sits inside a log string) or written as a --flag, then an
+// assignment: = : := or =>. An = followed by another = is a comparison, and a name right after ${ is a
+// shell default such as ${TOKEN:-unset}. As with START, a key may follow an escape such as \t but not a
+// lone backslash.
+const KEY = /(?:(?<![\w.$\\%-])|(?<=\\[nrt]))(?<!\$\{)(?:--)?((?:\\?["'])?)([A-Za-z_][\w.-]*)\1[ \t]*(:=|=>|:|=(?!=))[ \t]*/g;
 // The closing quote may be missing when a log cuts the JSON off mid-value; the value then runs to the line end.
 const QUOTED = /(["'])((?:\\.|(?!\1)[^\\\r\n])*)(?:\1|(?=[\r\n]|$))/dy;
+// Quoted with escaped quotes, as JSON inside a log string is.
+const ESCAPED_QUOTED = /\\(["'])((?:(?!\\\1)[^\r\n])*)(?:\\\1|(?=[\r\n]|$))/dy;
 // A shell or template reference is taken whole so the engine can skip it.
-const BARE = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s,;&'"(){}[\]]+/y;
+const BARE = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s,;&'"(){}[\]\\]+/y;
 // Matched against the key lowercased with separators removed, so api_key, apiKey and API-KEY all match.
 // Only the plural "credentials": AWS's Credential= is a key ID and a scope.
 const SENSITIVE =
@@ -27,8 +31,9 @@ export const sensitiveKeys: Rule = {
       const kind = kindFromName(key.split('.').pop()!);
       const reason = `${key} value`;
 
+      ESCAPED_QUOTED.lastIndex = at;
       QUOTED.lastIndex = at;
-      const quoted = QUOTED.exec(text);
+      const quoted = ESCAPED_QUOTED.exec(text) ?? QUOTED.exec(text);
       if (quoted) {
         const [start, end] = quoted.indices![2]!;
         return end > start ? [{ start, end, kind, reason }] : [];

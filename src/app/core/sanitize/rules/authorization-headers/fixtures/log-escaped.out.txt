@@ -1,0 +1,4 @@
+{"msg":"GET /v1 HTTP/1.1\nAuthorization: Bearer <bearer#1>\nX-Request-Id: 4f2c9a1e\nX-Api-Key: <api-key#2>\nAccept: */*"}
+send: b'GET / HTTP/1.1\r\nHost: api.example.com\r\nAuthorization: Bearer <bearer#3>\r\n\r\n'
+{"request":"{\"Authorization\":\"Bearer <bearer#4>\",\"Accept\":\"*/*\"}"}
+{"msg":"Authorization: Digest username=\"deploy\", response=\"<digest#5>\", opaque=\"5ccc069c\""}

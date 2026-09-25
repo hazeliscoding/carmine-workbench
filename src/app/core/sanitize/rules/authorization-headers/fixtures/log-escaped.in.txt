@@ -1,0 +1,4 @@
+{"msg":"GET /v1 HTTP/1.1\nAuthorization: Bearer {{secret:Qx7mZp2Lk9vR4tW8yB1}}\nX-Request-Id: 4f2c9a1e\nX-Api-Key: {{secret:3f9a8c2e1b7d4a60}}\nAccept: */*"}
+send: b'GET / HTTP/1.1\r\nHost: api.example.com\r\nAuthorization: Bearer {{secret:Qx7mZp2Lk9vR4tW8yB2}}\r\n\r\n'
+{"request":"{\"Authorization\":\"Bearer {{secret:Qx7mZp2Lk9vR4tW8yB3}}\",\"Accept\":\"*/*\"}"}
+{"msg":"Authorization: Digest username=\"deploy\", response=\"{{secret:6629fae49393a05397450978507c4ef1}}\", opaque=\"5ccc069c\""}

@@ -1,12 +1,13 @@
 import { Finding, Rule } from '../../types';
+import { START } from '../shared';
 
-// A Cookie or Set-Cookie header name, optionally quoted as a JSON or Python key, then a colon and an
-// optional opening quote.
-const HEADER = /(?<![\w-])(["']?)(set-cookie|cookie)\1[ \t]*:[ \t]*["']?/gi;
+// A Cookie or Set-Cookie header name, optionally quoted as a JSON or Python key (escaped when the JSON
+// sits inside a log string), then a colon and an optional opening quote.
+const HEADER = new RegExp(String.raw`${START}((?:\\?["'])?)(set-cookie|cookie)\1[ \t]*:[ \t]*(?:\\?["'])?`, 'gi');
 const CURL = /(?<!\S)(?:-b[ \t]*|--cookie(?:=|[ \t]+))["']?/g;
 // One name=value pair. A cookie value can't hold whitespace, quotes, commas, semicolons or backslashes,
 // except for a pair of double quotes around the whole value.
-const PAIR = /[ \t]*([^\s=;,"']+)=("?)([^\s;,"'\\]*)\2/dy;
+const PAIR = /[ \t]*([^\s=;,"'\\]+)=("?)([^\s;,"'\\]*)\2/dy;
 
 export const cookies: Rule = {
   name: 'cookies',

@@ -1,20 +1,21 @@
 import { Finding, Rule } from '../../types';
-import { kindFromName, looksLikeCredential } from '../shared';
+import { START, kindFromName, looksLikeCredential } from '../shared';
 
-// A header name, optionally quoted as a JSON or Python key, then a colon and an optional opening quote.
-// It matches only up to the value, so the next header on the same line is still found. A colon followed
-// by = is an assignment in code (token := …), not a header.
-const HEADER = /(?<![\w-])(["']?)([A-Za-z][\w-]*)\1[ \t]*:(?!=)[ \t]*["']?/g;
+// A header name, optionally quoted as a JSON or Python key (escaped when the JSON sits inside a log
+// string), then a colon and an optional opening quote. It matches only up to the value, so the next header
+// on the same line is still found. A colon followed by = is an assignment in code (token := …).
+const HEADER = new RegExp(String.raw`${START}((?:\\?["'])?)([A-Za-z][\w-]*)\1[ \t]*:(?!=)[ \t]*(?:\\?["'])?`, 'g');
 // A shell or template reference is taken whole so the engine can skip it; anything else runs up to
-// whitespace, a quote, a delimiter or a bracket. A value that opens an object or array isn't a credential.
-const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'",;{}()[\]]+/y;
+// whitespace, a quote, a delimiter, a bracket or an escape. A value that opens an object or array isn't a
+// credential.
+const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'",;{}()[\]\\]+/y;
 const SCHEME = /[A-Za-z][\w-]*[ \t]+(?=\S)/y;
 const KEY_HEADER = /(?:^|-)(?:api-?key|token|secret)$|-key$/;
 const NOT_KEY_HEADER = /^(?:idempotency-key|sec-websocket-key)$|(?:page|next|continuation)-token$/;
 const SCHEMES = new Set(['bearer', 'basic', 'token', 'bot', 'ssws', 'apikey', 'api-key', 'key', 'negotiate', 'ntlm', 'hmac', 'dpop', 'jwt', 'sharedkey', 'mac']);
 // Schemes whose credentials are name=value parameters. Only these parameters carry the secret.
 const PARAM_SCHEME = /^(?:digest|oauth|aws4-[\w-]+)$/;
-const PARAM = /([\w-]+)=(?:"([^"]*)"|([^\s,"']+))/dg;
+const PARAM = /(?<![\w-])([\w-]+)=(?:\\?"((?:(?!\\?")[^\r\n])*)\\?"|([^\s,"'\\]+))/dg;
 const SECRET_PARAM = /^(?:response|signature|oauth_signature|oauth_token|token)$/i;
 // curl's short flags take the value attached or after spaces; the long ones after = or spaces.
 const CURL_USER = /(?<!\S)(?:(-u|-U)[ \t]*|(--user|--proxy-user)(?:=|[ \t]+))(["']?)/g;
@@ -49,7 +50,7 @@ function authorization(text: string, at: number, reason: string): Finding[] {
 }
 
 function params(text: string, from: number, kind: string, reason: string): Finding[] {
-  const end = text.slice(from).search(/[\r\n]|$/) + from;
+  const end = text.slice(from).search(/[\r\n]|\\[rn]|$/) + from;
   return [...text.slice(from, end).matchAll(PARAM)].flatMap((p) => {
     const [start, stop] = p.indices![2] ?? p.indices![3]!;
     return SECRET_PARAM.test(p[1]!) && stop > start ? [{ start: from + start, end: from + stop, kind, reason }] : [];

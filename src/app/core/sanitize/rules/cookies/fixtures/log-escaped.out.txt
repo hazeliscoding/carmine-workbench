@@ -1,0 +1,2 @@
+{"msg":"GET /account HTTP/1.1\nCookie: sid=<cookie:sid#1>; theme=dark\nAccept: */*"}
+{"request":"{\"Cookie\":\"sessionid=<cookie:sessionid#2>\"}"}
