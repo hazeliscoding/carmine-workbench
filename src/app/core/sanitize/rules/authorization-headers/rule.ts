@@ -11,9 +11,9 @@ const HEADER = new RegExp(
   'g',
 );
 // A shell or template reference is taken whole so the engine can skip it; anything else runs up to
-// whitespace, a quote, a delimiter, a bracket or an escape. A value that opens an object or array isn't a
-// credential.
-const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'"`,;{}()[\]\\]+/y;
+// whitespace, a quote, a delimiter, a bracket, an escape or an angle bracket (HTML such as <br>, or a label
+// from an earlier pass). A value that opens an object or array isn't a credential.
+const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'"`,;{}()[\]\\<>]+/y;
 const SCHEME = /[A-Za-z][\w-]*[ \t]+(?=\S)/y;
 // Names that hold a credential. Most other *-key headers (X-Cache-Key, Sort-Key, X-Stripe-Publishable-Key)
 // don't, and their values then spread through the paste as copies.

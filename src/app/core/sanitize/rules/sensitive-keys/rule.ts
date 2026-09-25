@@ -16,7 +16,7 @@ const QUOTED = /(["'`])((?:\\.|(?!\1)[^\\\r\n])*)(?:\1|(?=[\r\n]|$))/dy;
 // Quoted with escaped quotes, as JSON inside a log string is.
 const ESCAPED_QUOTED = /\\(["'])((?:(?!\\\1)[^\r\n])*)(?:\\\1|(?=[\r\n]|$))/dy;
 // A shell or template reference is taken whole so the engine can skip it.
-const BARE = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s,;&'"(){}[\]\\]+/y;
+const BARE = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s,;&'"(){}[\]\\<>]+/y;
 // Matched against the key lowercased with separators removed, so api_key, apiKey and API-KEY all match.
 // Only the plural "credentials": AWS's Credential= is a key ID and a scope.
 const SENSITIVE =
