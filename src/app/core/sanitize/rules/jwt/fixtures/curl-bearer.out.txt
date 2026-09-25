@@ -1,0 +1,3 @@
+curl https://api.example.com/v1/orders \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer <jwt#1>'

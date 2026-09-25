@@ -1,0 +1,7 @@
+{
+  "access_token": "{{fake:jwt}}",
+  "id_token": "{{fake:jwt:2}}",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "openid orders:read"
+}
