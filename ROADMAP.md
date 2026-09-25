@@ -18,6 +18,12 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - **Colors** keep the directive//01 palette. Five tokens changed to pass WCAG 2.2 AA on every surface the UI uses, not only the page. The `AA` notes in `src/styles/tokens.css` give the old values, and `scripts/check-contrast.mjs` checks each pair in CI.
 - **HTTP crates** are checked with `cargo tree` for the three desktop targets. `Cargo.lock` also lists crates for mobile, where tauri pulls in `reqwest`, so scanning it gives false positives.
 - **CI** builds on Linux only until the M2 release workflow adds Windows and macOS.
+- **The engine scans raw text.** It doesn't detect or parse formats, because real pastes mix curl, headers, logs and cut-off JSON. Output bytes stay the same outside the removed values, and the input's line endings are kept.
+- **Overlaps:** format rules (`jwt`, `private-keys`, `known-secret-formats`) outrank context rules (headers, cookies, parameters, keys), and then the longer span wins. An overlapping finding merges into the winner, and the union of both spans is replaced under the winner's label.
+- **Labels** are numbered across all kinds in order of first appearance. A label belongs to the value, whichever rule found it. Every other copy of a removed value of 8 or more characters gets the same label, even where no rule matches.
+- **Kept on purpose:** references (`$TOKEN`, `{{token}}`, `<token>`, `***`, existing labels), plain cookie values under 8 characters (`theme=dark`), `token_type`, pagination tokens and Stripe `pk_` keys. Sanitizing twice changes nothing.
+- **Fake secrets** are built at test time. Fixture inputs write every secret as `{{secret:…}}` or `{{fake:<format>}}`. GitHub's partner scanning of public repos can't be scoped, so an allowlist would only hide the alerts here while vendors still got notified.
+- **Claims:** the engine returns the decoded claims. Writing the claims block into the copied output is M2, along with its toggle.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -41,8 +47,8 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 
 - [ ] Engine: runs all rules, resolves overlaps (the most specific finding wins), assigns labels, and returns the output plus a change list.
 - [ ] Rule contract: one folder per rule, containing `rule.ts` (findings with position, kind and reason) and `fixtures/` (input and expected-output pairs).
-- [ ] Fixture runner, plus a **no-leak check**: no secret value from a fixture may appear in its output.
-- [ ] Keep fake secrets in fixtures from tripping GitHub secret scanning. Either build them at test time or scope an allowlist.
+- [ ] Fixture runner, plus a **no-leak check**: no secret value from a fixture may appear in its output. Also check that every removed value is declared, and that sanitizing a second time changes nothing.
+- [ ] Keep fake secrets in fixtures from tripping GitHub secret scanning by building them at test time from placeholders.
 - [ ] The seven rules:
 
 | Rule | Covers |
@@ -53,7 +59,7 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 | `url-params` | `access_token`, `code`, `client_secret`, `sig` and similar; `user:pass@host` in URLs |
 | `sensitive-keys` | JSON, form and env keys such as `password`, `secret`, `token`, `api_key`, `refresh_token` |
 | `private-keys` | PEM `PRIVATE KEY` blocks |
-| `known-secret-formats` | Vendor key prefixes (AWS, GitHub, Stripe, Slack, Google, …) |
+| `known-secret-formats` | Vendor key prefixes: AWS, GitHub, Stripe, Slack and Google. More vendors come as good first issues in M3 |
 
 **Done when:** every fixture passes, across curl commands, raw headers, logs and JSON bodies.
 
