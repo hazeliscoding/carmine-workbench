@@ -1,0 +1,3 @@
+DEBUG form: {'password': b'{{secret:hunter2-staging}}', 'user': b'usr_034'}
+config = dict(api_token=f"{{secret:tok-8c1f0b2e9d7a}}", region="eu-west-1")
+const token = `{{secret:Qx7mZp2Lk9vR4tW8yB9}}`;

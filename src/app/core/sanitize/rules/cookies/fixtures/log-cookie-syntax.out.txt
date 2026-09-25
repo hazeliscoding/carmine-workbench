@@ -1,0 +1,2 @@
+DEBUG urllib3 headers: {'Cookie': b'sid=<cookie:sid#1>; theme=dark'}
+map[Cookie:[sid=<cookie:sid#2>] Accept:[*/*]]

@@ -1,0 +1,2 @@
+DEBUG urllib3 headers: {'Cookie': b'sid={{secret:9f3e1c7a5b2d8e40}}; theme=dark'}
+map[Cookie:[sid={{secret:0a7c3e9b1d5f2e84}}] Accept:[*/*]]

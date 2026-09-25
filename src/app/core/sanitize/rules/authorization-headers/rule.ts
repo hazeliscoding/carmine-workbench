@@ -2,13 +2,17 @@ import { Finding, Rule } from '../../types';
 import { START, kindFromName, looksLikeCredential } from '../shared';
 
 // A header name, optionally quoted as a JSON or Python key (escaped when the JSON sits inside a log
-// string), then a colon and an optional opening quote. It matches only up to the value, so the next header
-// on the same line is still found. A colon followed by = is an assignment in code (token := …).
-const HEADER = new RegExp(String.raw`${START}((?:\\?["'])?)([A-Za-z][\w-]*)\1[ \t]*:(?!=)[ \t]*(?:\\?["'])?`, 'g');
+// string, or a Python b'' string), then a separator and an optional opening quote or Go map bracket. It
+// matches only up to the value, so the next header on the same line is still found. The separator is a
+// colon, or = and => as in PowerShell and Ruby hashes; := is an assignment in code (token := …).
+const HEADER = new RegExp(
+  String.raw`${START}(?:[bBrRuUfF]{0,2}(\\?["']))?([A-Za-z][\w-]*)\1[ \t]*(?::(?!=)|=>|=(?![=>]))[ \t]*\[?(?:[bBrRuUfF]{0,2}\\?["'\`])?`,
+  'g',
+);
 // A shell or template reference is taken whole so the engine can skip it; anything else runs up to
 // whitespace, a quote, a delimiter, a bracket or an escape. A value that opens an object or array isn't a
 // credential.
-const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'",;{}()[\]\\]+/y;
+const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'"`,;{}()[\]\\]+/y;
 const SCHEME = /[A-Za-z][\w-]*[ \t]+(?=\S)/y;
 const KEY_HEADER = /(?:^|-)(?:api-?key|token|secret)$|-key$/;
 const NOT_KEY_HEADER = /^(?:idempotency-key|sec-websocket-key)$|(?:page|next|continuation)-token$/;

@@ -1,13 +1,17 @@
 import { Rule } from '../../types';
 import { kindFromName } from '../shared';
 
-// A key, optionally quoted (escaped when the JSON sits inside a log string) or written as a --flag, then an
-// assignment: = : := or =>. An = followed by another = is a comparison, and a name right after ${ is a
-// shell default such as ${TOKEN:-unset}. As with START, a key may follow an escape such as \t but not a
-// lone backslash.
-const KEY = /(?:(?<![\w.$\\%-])|(?<=\\[nrt]))(?<!\$\{)(?:--)?((?:\\?["'])?)([A-Za-z_][\w.-]*)\1[ \t]*(:=|=>|:|=(?!=))[ \t]*/g;
-// The closing quote may be missing when a log cuts the JSON off mid-value; the value then runs to the line end.
-const QUOTED = /(["'])((?:\\.|(?!\1)[^\\\r\n])*)(?:\1|(?=[\r\n]|$))/dy;
+// A key, optionally quoted (escaped when the JSON sits inside a log string, or a Python b'' string) or
+// written as a --flag, then an assignment: = : := or =>. An = followed by another = is a comparison, and a
+// name right after ${ is a shell default such as ${TOKEN:-unset}. As with START, a key may follow an
+// escape such as \t but not a lone backslash.
+const KEY =
+  /(?:(?<![\w.$\\%-])|(?<=\\[nrt]))(?<!\$\{)(?:--)?(?:[bBrRuUfF]{0,2}(\\?["']))?([A-Za-z_][\w.-]*)\1[ \t]*(:=|=>|:|=(?!=))[ \t]*/g;
+// Python's b'', f'' and similar string prefixes.
+const STRING_PREFIX = /[bBrRuUfF]{1,2}(?=\\?["'`])/y;
+// The closing quote may be missing when a log cuts the JSON off mid-value; the value then runs to the line
+// end. Backticks are JavaScript template strings.
+const QUOTED = /(["'`])((?:\\.|(?!\1)[^\\\r\n])*)(?:\1|(?=[\r\n]|$))/dy;
 // Quoted with escaped quotes, as JSON inside a log string is.
 const ESCAPED_QUOTED = /\\(["'])((?:(?!\\\1)[^\r\n])*)(?:\\\1|(?=[\r\n]|$))/dy;
 // A shell or template reference is taken whole so the engine can skip it.
@@ -27,7 +31,8 @@ export const sensitiveKeys: Rule = {
       const key = m[2]!;
       const normalized = key.toLowerCase().replace(/[^a-z\d]/g, '');
       if (!SENSITIVE.test(normalized) || NOT_SENSITIVE.test(normalized)) return [];
-      const at = m.index + m[0].length;
+      STRING_PREFIX.lastIndex = m.index + m[0].length;
+      const at = STRING_PREFIX.lastIndex + (STRING_PREFIX.exec(text)?.[0].length ?? 0);
       const kind = kindFromName(key.split('.').pop()!);
       const reason = `${key} value`;
 

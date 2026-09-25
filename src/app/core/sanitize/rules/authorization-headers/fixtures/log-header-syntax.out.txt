@@ -1,0 +1,5 @@
+DEBUG urllib3 headers: {'X-Amz-Security-Token': b'<amz-security-token#1>', 'User-Agent': b'Boto3/1.40'}
+headers = {"Authorization": f"Bearer <bearer#2>"}
+Invoke-RestMethod -Uri https://api.example.com/v1/orders -Headers @{Authorization = "Bearer <bearer#3>"}
+Net::HTTP::Get.new(uri, 'Authorization' => 'Bearer <bearer#4>')
+map[Accept:[*/*] Authorization:[Bearer <bearer#5>] X-Api-Key:[<api-key#6>]]

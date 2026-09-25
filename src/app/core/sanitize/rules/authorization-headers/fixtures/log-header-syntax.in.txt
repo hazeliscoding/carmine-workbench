@@ -1,0 +1,5 @@
+DEBUG urllib3 headers: {'X-Amz-Security-Token': b'{{secret:FQoGZXIvYXdzFakeSessionToken0123456789}}', 'User-Agent': b'Boto3/1.40'}
+headers = {"Authorization": f"Bearer {{secret:Qx7mZp2Lk9vR4tW8yB4}}"}
+Invoke-RestMethod -Uri https://api.example.com/v1/orders -Headers @{Authorization = "Bearer {{secret:Qx7mZp2Lk9vR4tW8yB5}}"}
+Net::HTTP::Get.new(uri, 'Authorization' => 'Bearer {{secret:Qx7mZp2Lk9vR4tW8yB6}}')
+map[Accept:[*/*] Authorization:[Bearer {{secret:Qx7mZp2Lk9vR4tW8yB7}}] X-Api-Key:[{{secret:k3y-f0r-0rders-api-8}}]]
