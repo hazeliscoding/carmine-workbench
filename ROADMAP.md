@@ -26,6 +26,19 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - **Performance:** the engine and rules stay linear, because M2 sanitizes as you type. A test holds a 1 MB input under 3 s; it takes about 0.3 s.
 - **Fake secrets** are built at test time. Fixture inputs write every secret as `{{secret:…}}` or `{{fake:<format>}}`. GitHub's partner scanning of public repos can't be scoped, so an allowlist would only hide the alerts here while vendors still got notified.
 - **Claims:** the engine returns the decoded claims. Writing the claims block into the copied output is M2, along with its toggle.
+- **Input** is a native textarea. Removed values are marked only in the diff, which is built from change positions, not by matching values. Input marks or CodeMirror come back only if the dogfooding log asks for them.
+- **Sanitize as you type** runs on the main thread, with no Web Worker. Paste runs at once, typing waits 150 ms, and Copy always sanitizes the current input first.
+- **The textarea turns CRLF into LF**, so text copied from the app uses LF. The engine still keeps CRLF for callers that pass it, such as the tests and the future CLI.
+- **Times** are UTC, written with the zone: `2026.09.24 08:19 UTC`. The Explain panel shows live ages. The copied block has one `as of` stamp, and its ages count from it (`expired 12m earlier`), so it stays true when read later.
+- **The claims block** lists every header field and claim as `#   key: <JSON value>`. It is sanitized in one pass with the input, so a claim equal to a removed value becomes that value's label, whatever its length. Copy writes nothing if that pass fails.
+- **Summary wording:** "1 secret removed, review before sharing", or "Nothing removed, review before sharing" when there are none. The count is distinct labels.
+- **Copy** calls `navigator.clipboard.writeText` inside the click or key handler, with no clipboard plugin. Only `copy.ts` writes the clipboard, and nothing reads it.
+- **The webview** runs incognito with autofill off. On Windows the app creates its own WebView2 environment with crash reporting off, because a crash dump can hold pasted input. It clears leftover dumps at startup and limits navigation to the app.
+- **Installers** don't download anything. Windows uses `webviewInstallMode: skip`, since every other mode ships download code or adds 127 MB or more. The app shows Microsoft's download link when WebView2 is missing.
+- **Release builds:** a per-user NSIS installer, one universal `.dmg` with an ad-hoc signature, and `.deb` and `.rpm` built in an `ubuntu:22.04` container for a glibc 2.35 baseline. There is no AppImage: it bundles a WebKitGTK that gets no security updates, and its build tools are downloaded without a hash check. Without the ad-hoc signature, Apple Silicon reports the unsigned app as damaged.
+- **Release workflow:** written by hand, not tauri-action. Build jobs are read-only, and one tag-only job with write access runs no repo code. Actions are pinned by SHA, one `SHA256SUMS` covers the assets, and the release starts as a draft. PR CI stays on Linux.
+- **Release checks:** an agent runs a CDP and SendKeys probe against the Windows draft, with the clipboard stubbed. CI installs the `.deb` under Xvfb, pastes and copies with xdotool and xclip, and reads the real clipboard. The macOS build is launched on arm64 and Intel runners. Nothing automated checks Copy on macOS.
+- **The dogfooding log** is `docs/dogfooding.md`, in public. Entries name formats, never values, hosts or employers. A test fails if sanitizing the log would change it, or if it names a host outside `example.com`, `.test` or `localhost`.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -67,27 +80,43 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 
 ## M2: v0.1.0
 
-- [ ] Wire the UI to the engine: sanitize as you type, findings list, diff toggle, and **Copy sanitized** (Ctrl/⌘+Shift+C).
-- [ ] JWT Explain panel:
-  - [ ] alg and kid; iss, sub and aud; exp, iat and nbf in dotted time with relative age;
-  - [ ] warnings for `alg: none`, a missing `exp`, and very long lifetimes;
+- [ ] Engine fixes before sanitizing as you type:
+  - [ ] Keep the rules linear on one long line: Digest, AWS4 and OAuth parameters, HTTPie `-a`, `mysql -p`. A 200 KB line of Digest headers takes 6.4 s today.
+  - [ ] Never give a new value a label number that the input already holds.
+- [ ] Wire the UI to the engine:
+  - [ ] A pure review model in `src/app/core/review/`: output offsets, a diff from change positions with unchanged lines folded, findings rows and the summary. It replaces `text.ts`, whose line diff is quadratic. The purity check covers all of `src/app/core`.
+  - [ ] Before the UI code lands, the network guard also fails on storage, worker, clipboard-read and URL or title APIs, allows clipboard writes only in `copy.ts`, and scans the built bundle.
+  - [ ] Sanitize as you type in a textarea, with the findings list, an empty state and **Load sample**. The sample is assembled at runtime, like the fixtures.
+  - [ ] Diff and Output toggle.
+  - [ ] **Copy sanitized** (Ctrl/⌘+Shift+C), always from the current input.
+- [ ] Dogfooding log: real debugging sessions, noting anything that was missed. It starts once Copy works.
+- [ ] JWT Explain panel, for one JWT or several:
+  - [ ] alg and kid; iss, sub and aud; exp, iat and nbf in dotted UTC time with relative age;
+  - [ ] warnings for `alg: none`, a missing `exp`, lifetimes over 24 h, `exp` in milliseconds, and `nbf` or `iat` in the future;
   - [ ] the label "decoded, not verified".
-- [ ] Claims block in the copied output, with its toggle.
+- [ ] Claims block in the copied output, with its toggle. The README's before-and-after is regenerated from it.
+- [ ] Wording never says "clean". It says "4 secrets removed, review before sharing". A test checks every status line.
 - [ ] Input stays in memory only. No history. The clipboard is written only on Copy.
-- [ ] Wording never says "clean". It says "4 secrets removed, review before sharing".
+  - [ ] Incognito window with autofill off. The guard checks every Tauri config, capability and Cargo feature.
+  - [ ] Windows: the app's own WebView2 environment, with crash reporting off, leftover dumps cleared, a message when WebView2 is missing, and navigation limited to the app.
 - [ ] Release workflow: Windows, macOS and Linux builds on GitHub Releases, unsigned, with SHA-256 checksums.
-- [ ] Dogfooding log: real debugging sessions, noting anything that was missed.
+  - [ ] Bundle config: installer formats, `webviewInstallMode: skip`, the ad-hoc signature, app metadata and the third-party notices.
+  - [ ] Windows acceptance probe: paste, check and copy over CDP and SendKeys against the installer, then scan the disk for a planted value.
+  - [ ] Linux smoke test in CI and a macOS launch check.
+  - [ ] The workflow itself, with `ci.yml`'s actions pinned by SHA too.
+  - [ ] Version 0.1.0, and a README with install steps, notes on unsigned builds and screenshots of the live app.
 
-**Done when:** in a released build, you can paste a curl command, see its secrets removed, and copy the result.
+**Done when:** in a released build, you can paste a curl command, see its secrets removed, and copy the result. The Windows probe checks this against the draft release before it is published.
 
 ## M3: v0.2, ready for contributors
 
 - [ ] `CONTRIBUTING.md`: how to add a rule in one folder, with a rule template.
-- [ ] `SECURITY.md`, plus a privacy contract document that lists each promise and how it is enforced.
+- [ ] `SECURITY.md`, plus a privacy contract document that lists each promise and how it is enforced. It also names what happens outside the app's control: WebView2's own updates, Windows clipboard history, and crash handlers on Linux and macOS.
 - [ ] A "Missed a secret" issue template. It asks for the format, never the real value.
 - [ ] Good-first-issue list of secret formats. Start with the gaps found in the M1 review: XML (`<password>`, `<add key="ApiKey" value="…"/>`), `.netrc`, Docker config `auth`, `?key=` for vendors other than Google, `?subscription-key=`, and Google `1//` refresh tokens.
 - [ ] HAR support.
-- [ ] Review flags: leftover high-entropy strings are flagged for review, not silently removed.
+- [ ] Review flags: leftover high-entropy strings are flagged for review, not silently removed. That includes readable identifiers and unknown custom claims in the copied claims block, such as `nonce`, `jti` or `pin`.
+- [ ] Crate license notices in the bundle, next to Angular's and the fonts'.
 - [ ] Label kinds come from key names, so a secret glued into a name (`AWS_AKIA…_SECRET=…`) shows up inside its label. Fall back to a generic kind when that happens.
 
 ## Later
@@ -100,12 +129,17 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - JWT signature check with a key pasted locally
 - Values split across lines: curl `\` line continuations and folded headers
 - Copies across encodings, such as a value that appears both raw and URL-encoded (`+` and `%2B`), or both inside and outside a Basic header
+- Marks and line numbers in the input pane, or CodeMirror 6, if the dogfooding log asks for them
+- Sanitizing in a Web Worker, if the log records typing lag
+- Click a finding to find it in the text
+- AppImage or Flatpak on request; MSI, a portable exe, and ARM64 builds for Windows and Linux
 
 ## Not planned
 
 - General utility tools such as JSON formatting, Base64 or UUIDs. DevToys and CyberChef cover these.
 - Scanning repositories for secrets. gitleaks and trufflehog do this.
 - Accounts, sync, telemetry or anything hosted.
+- Automated UI tests on macOS. The only WebDriver route there embeds an HTTP server in the app.
 
 ## How we'll know it works
 
