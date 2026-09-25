@@ -1,0 +1,2 @@
+git clone https://x-access-token:<github-token#1>@github.com/example/orders.git
+git remote set-url origin https://token:<password#2>@gitlab.example.com/orders/api.git
