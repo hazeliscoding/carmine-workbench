@@ -1,0 +1,4 @@
+07:19:02 INFO  GET /v1/products?code=SKU-12345 200
+07:19:02 INFO  {"sku":"SKU-12345","status":"out of stock"}
+07:19:02 INFO  item SKU-12345 out of stock
+07:19:02 INFO  GET /callback?code=200&auth=required&sig=verified&signature=none-given
