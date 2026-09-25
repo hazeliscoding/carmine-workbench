@@ -1,4 +1,4 @@
-import { Rule } from '../../types';
+import { Finding, Rule } from '../../types';
 import { kindFromName } from '../shared';
 
 // A key, optionally quoted (escaped when the JSON sits inside a log string, or a Python b'' string) or
@@ -22,34 +22,40 @@ const SENSITIVE =
   /(?:password|passwd|passphrase|secret|token|apikey|privatekey|secretkey|secretaccesskey|accountkey|signingkey|encryptionkey|masterkey|sessionid|credentials)$|^(?:pwd|pass)$/;
 // Pagination cursors and token_type end like secrets but grant nothing.
 const NOT_SENSITIVE = /(?:tokentype|(?:next|page|continuation|pagination)token)$/;
+// A command-line flag with its value after a space, as in docker login --password …
+const FLAG = /(?<!\S)--([A-Za-z][\w-]*)[ \t]+(?=[^\s-])/g;
 
 export const sensitiveKeys: Rule = {
   name: 'sensitive-keys',
   by: 'context',
   find: (text) =>
-    [...text.matchAll(KEY)].flatMap((m) => {
-      const key = m[2]!;
-      const normalized = key.toLowerCase().replace(/[^a-z\d]/g, '');
-      if (!SENSITIVE.test(normalized) || NOT_SENSITIVE.test(normalized)) return [];
-      STRING_PREFIX.lastIndex = m.index + m[0].length;
-      const at = STRING_PREFIX.lastIndex + (STRING_PREFIX.exec(text)?.[0].length ?? 0);
-      const kind = kindFromName(key.split('.').pop()!);
-      const reason = `${key} value`;
-
-      ESCAPED_QUOTED.lastIndex = at;
-      QUOTED.lastIndex = at;
-      const quoted = ESCAPED_QUOTED.exec(text) ?? QUOTED.exec(text);
-      if (quoted) {
-        const [start, end] = quoted.indices![2]!;
-        return end > start ? [{ start, end, kind, reason }] : [];
-      }
-      BARE.lastIndex = at;
-      const bare = BARE.exec(text)?.[0];
-      if (!bare) return [];
-      const end = at + bare.length;
-      // A JSON number is a flag or a count. Code such as os.environ["X"] or os.Getenv("X") reads the
-      // secret from somewhere else.
-      if ((m[3] === ':' && /^-?\d+(?:\.\d+)?$/.test(bare)) || /[([]/.test(text[end] ?? '')) return [];
-      return [{ start: at, end, kind, reason }];
-    }),
+    [
+      ...[...text.matchAll(KEY)].map((m) => ({ key: m[2]!, separator: m[3]!, at: m.index + m[0].length })),
+      ...[...text.matchAll(FLAG)].map((m) => ({ key: m[1]!, separator: ' ', at: m.index + m[0].length })),
+    ].flatMap(({ key, separator, at }) => valueOf(text, key, separator, at)),
 };
+
+function valueOf(text: string, key: string, separator: string, from: number): Finding[] {
+  const normalized = key.toLowerCase().replace(/[^a-z\d]/g, '');
+  if (!SENSITIVE.test(normalized) || NOT_SENSITIVE.test(normalized)) return [];
+  STRING_PREFIX.lastIndex = from;
+  const at = from + (STRING_PREFIX.exec(text)?.[0].length ?? 0);
+  const kind = kindFromName(key.split('.').pop()!);
+  const reason = `${key} value`;
+
+  ESCAPED_QUOTED.lastIndex = at;
+  QUOTED.lastIndex = at;
+  const quoted = ESCAPED_QUOTED.exec(text) ?? QUOTED.exec(text);
+  if (quoted) {
+    const [start, end] = quoted.indices![2]!;
+    return end > start ? [{ start, end, kind, reason }] : [];
+  }
+  BARE.lastIndex = at;
+  const bare = BARE.exec(text)?.[0];
+  if (!bare) return [];
+  const end = at + bare.length;
+  // A JSON number is a flag or a count. Code such as os.environ["X"] or os.Getenv("X") reads the
+  // secret from somewhere else.
+  if ((separator === ':' && /^-?\d+(?:\.\d+)?$/.test(bare)) || /[([]/.test(text[end] ?? '')) return [];
+  return [{ start: at, end, kind, reason }];
+}
