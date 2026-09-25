@@ -18,6 +18,23 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "LICENSE",
+                "input": "node_modules/@fontsource-variable/public-sans",
+                "output": "licenses/public-sans"
+              },
+              {
+                "glob": "LICENSE",
+                "input": "node_modules/@fontsource/barlow-semi-condensed",
+                "output": "licenses/barlow-semi-condensed"
+              },
+              {
+                "glob": "LICENSE",
+                "input": "node_modules/@fontsource-variable/jetbrains-mono",
+                "output": "licenses/jetbrains-mono"
+              }
+            ],
             "styles": [
               "src/styles.css"
             ]

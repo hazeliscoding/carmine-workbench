@@ -1,0 +1,101 @@
+/* directive//01 tokens, adapted for Carmine: self-hosted fonts, theme from prefers-color-scheme,
+   and colors marked "AA" changed to pass WCAG 2.2 AA. scripts/check-contrast.mjs checks every pair. */
+:root {
+  color-scheme: light dark;
+
+  /* base: office paper */
+  --paper: #f2ede2;
+  --ivory: #f8f5ec;
+  --bone: #ece5d5;
+  --bureau: #e0d8c6;
+  --line: #d3cab6;
+  --line-strong: #b3a88f;
+  --graphite: #57503f;
+  --ink: #1b1812;
+  --ink-soft: #3a352a;
+
+  /* character */
+  --auburn: #7e4a33;
+  --amber: #7f611b; /* AA: was #a17b22 */
+  --wine: #63242c;
+  --directive-red: #9e2b2b;
+  --authorized: #4d6b50;
+
+  /* surfaces and text */
+  --surface-page: var(--paper);
+  --surface-card: var(--ivory);
+  --surface-inset: var(--bone);
+  --text-primary: var(--ink);
+  --text-secondary: var(--graphite);
+  --text-meta: #6c6453; /* AA: was #7d7460 */
+  --text-inverse: #f0ebdd;
+  --text-link: var(--auburn);
+
+  /* sanitize views */
+  --diff-del-bg: color-mix(in srgb, var(--directive-red) 12%, var(--surface-page));
+  --diff-add-bg: color-mix(in srgb, var(--authorized) 14%, var(--surface-page));
+  --mark-bg: color-mix(in srgb, var(--directive-red) 16%, var(--surface-inset));
+
+  /* type */
+  --font-official: 'Public Sans Variable', system-ui, sans-serif;
+  --font-directive: 'Barlow Semi Condensed', 'Public Sans Variable', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --text-xs: 11px;
+  --text-meta-size: 12px;
+  --text-secondary-size: 13px;
+  --text-body: 14px;
+  --text-primary-size: 15px;
+  --leading-tight: 1.25;
+  --leading-body: 1.55;
+  --leading-code: 1.6;
+  --tracking-directive: 0.08em;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* spacing */
+  --space-01: 2px;
+  --space-02: 4px;
+  --space-03: 8px;
+  --space-04: 12px;
+  --space-05: 16px;
+  --space-06: 20px;
+  --space-07: 24px;
+  --space-08: 32px;
+
+  /* borders */
+  --border-paper: 1px solid var(--line);
+  --border-record: 1px solid var(--line-strong);
+  --radius-standard: 2px;
+
+  /* motion */
+  --motion-standard: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #191712;
+    --ivory: #1f1c16;
+    --bone: #26221a;
+    --bureau: #2e2920;
+    --line: #3a352a;
+    --line-strong: #57503f;
+    --graphite: #a89d85;
+    --ink: #e9e2d1;
+    --ink-soft: #cfc6b0;
+    --auburn: #a76243; /* AA: directive//01 kept the light value, a 2.49 focus ring */
+    --amber: #c09a3e;
+    --wine: #7c3540;
+    --directive-red: #c96a64; /* AA: was #b84740 */
+    --authorized: #718c71; /* AA: was #6f8a6f */
+    --surface-inset: #15130f;
+    --text-meta: #8d8573; /* AA: was #8a8271 */
+    --text-inverse: #1b1812;
+    --text-link: #c98d63;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-standard: 0ms;
+  }
+}

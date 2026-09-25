@@ -21,6 +21,8 @@ jobs:
         run: node --test "scripts/*.test.mjs"
       - name: Network guard
         run: node scripts/check-network.mjs
+      - name: Contrast check
+        run: node scripts/check-contrast.mjs
 
   build:
     name: Build

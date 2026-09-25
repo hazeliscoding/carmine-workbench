@@ -12,15 +12,20 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - **UI** uses the directive//01 design system and the shell of the Devbox demo mockup, re-skinned as a single Sanitize screen.
 - **Brand** is option 1A, "Caliper": two measuring jaws holding a single datum. The wordmark is Barlow Semi Condensed, converted to vector paths. The assets are in `docs/brand/`, with `-dark` files for dark backgrounds.
 
+## Decisions (2026-09-25)
+
+- **Fonts** come from Fontsource packages and are bundled into the app, with their OFL licenses under `licenses/`. Source Serif 4 is dropped, because Carmine has no personal voice.
+- **Colors** keep the directive//01 palette. Five tokens changed to pass WCAG 2.2 AA on every surface the UI uses, not only the page. The `AA` notes in `src/styles/tokens.css` give the old values, and `scripts/check-contrast.mjs` checks each pair in CI.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (Apache-2.0).
 - [x] Scaffold Angular + Tauri v2.
 - [x] Generate the app and installer icons from `docs/brand/mark.svg`. Put the mark on a paper-colored tile, because its dark strokes disappear on a dark taskbar.
-- [ ] Adapt the directive//01 tokens:
-  - [ ] Self-host the fonts under OFL licenses (Public Sans, Barlow Semi Condensed, JetBrains Mono) instead of loading Google Fonts.
-  - [ ] Drop the Lucide icons loaded from a CDN.
-  - [ ] Fix the colors that fail WCAG AA: light `--text-meta` (3.96), light `--amber` (3.35), dark `--directive-red` (3.42) and the dark focus ring (2.49).
+- [x] Adapt the directive//01 tokens:
+  - [x] Self-host the fonts under OFL licenses (Public Sans, Barlow Semi Condensed, JetBrains Mono) instead of loading Google Fonts.
+  - [x] Drop the Lucide icons loaded from a CDN.
+  - [x] Fix the colors that fail WCAG AA: light `--text-meta` (3.96), light `--amber` (3.35), dark `--directive-red` (3.42) and the dark focus ring (2.49).
 - [ ] Build a static Sanitize screen with a canned sample: findings list, input, sanitized output with diff, JWT panel, and a `LOCAL · NO NETWORK` status bar.
 - [ ] Turn on the privacy guardrails from the first commit:
   - [x] a Content Security Policy that blocks outbound connections;
