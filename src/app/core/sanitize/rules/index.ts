@@ -1,5 +1,6 @@
 import { Rule } from '../types';
 import { authorizationHeaders } from './authorization-headers/rule';
+import { cookies } from './cookies/rule';
 import { jwt } from './jwt/rule';
 
-export const RULES: readonly Rule[] = [jwt, authorizationHeaders];
+export const RULES: readonly Rule[] = [jwt, authorizationHeaders, cookies];

@@ -1,0 +1,4 @@
+curl https://app.example.com/account \
+  -b 'sid=<cookie:sid#1>; theme=dark; lang=en' \
+  --cookie "remember_token=<cookie:remember_token#2>"
+curl -b cookies.txt -c cookies.txt https://app.example.com/login

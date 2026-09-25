@@ -1,0 +1,4 @@
+GET /account HTTP/1.1
+Host: app.example.com
+Cookie: _ga=<cookie:_ga#1>; sid=<cookie:sid#2>; theme=dark; session="<cookie:session#3>"
+Accept: text/html

@@ -1,0 +1,6 @@
+07:19:02 INFO  Set-Cookie: theme=dark; Path=/; Max-Age=31536000
+07:19:02 DEBUG Cookie: lang=en; tz=UTC; consent=1
+07:19:02 DEBUG cookie jar saved to cookies.txt
+curl -b cookies.txt https://app.example.com/
+curl --cookie-jar jar.txt https://app.example.com/
+curl -b "sid=$SESSION_ID" https://app.example.com/

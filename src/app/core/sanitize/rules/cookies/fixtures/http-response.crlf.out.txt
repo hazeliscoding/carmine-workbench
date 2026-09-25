@@ -1,0 +1,6 @@
+HTTP/1.1 302 Found
+Location: /account
+Set-Cookie: __Host-sid=<cookie:__Host-sid#1>; Path=/; Secure; HttpOnly; SameSite=Lax
+Set-Cookie: csrftoken=<cookie:csrftoken#2>; Expires=Thu, 24 Sep 2026 08:19:00 GMT; Path=/
+Set-Cookie: theme=dark; Path=/; Max-Age=31536000
+

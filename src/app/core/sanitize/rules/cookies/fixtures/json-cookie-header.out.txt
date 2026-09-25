@@ -1,0 +1,2 @@
+{"url":"https://app.example.com/account","headers":{"cookie":"sid=<cookie:sid#1>; lang=en-US","user-agent":"orders-cli/1.14"}}
+session.get(url, headers={'Cookie': 'sessionid=<cookie:sessionid#2>'})

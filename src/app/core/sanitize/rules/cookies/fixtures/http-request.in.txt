@@ -1,0 +1,4 @@
+GET /account HTTP/1.1
+Host: app.example.com
+Cookie: _ga={{secret:GA1.2.1234567890.1790234340}}; sid={{secret:9f3e1c7a5b2d8e40}}; theme=dark; session="{{secret:eW91LXdvdWxkbnQtZG93bmxvYWQ}}"
+Accept: text/html
