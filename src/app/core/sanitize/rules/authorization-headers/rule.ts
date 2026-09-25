@@ -1,5 +1,5 @@
 import { Finding, Rule } from '../../types';
-import { START, kindFromName, looksLikeCode, looksLikeCredential } from '../shared';
+import { START, VALUE_STOP, isCallee, kindFromName, looksLikeCode, looksLikeCredential } from '../shared';
 
 // A header name, optionally quoted as a JSON or Python key (escaped when the JSON sits inside a log
 // string, or a Python b'' string), then a separator and an optional opening quote or Go map bracket. It
@@ -11,9 +11,12 @@ const HEADER = new RegExp(
   'g',
 );
 // A shell or template reference is taken whole so the engine can skip it; anything else runs up to
-// whitespace, a quote, a delimiter, a bracket, an escape or an angle bracket (HTML such as <br>, or a label
-// from an earlier pass). A value that opens an object or array isn't a credential.
-const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'"`,;{}()[\]\\<>]+/y;
+// whitespace, a quote, a delimiter, a bracket, an escape, an HTML tag or a label. A value that opens an
+// object or array, or starts with <, isn't a credential.
+const CREDENTIAL = new RegExp(
+  String.raw`\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|(?!<)(?:(?!${VALUE_STOP})[^\s'"\`,;{}()[\]\\])+`,
+  'iy',
+);
 const SCHEME = /[A-Za-z][\w-]*[ \t]+(?=\S)/y;
 // Names that hold a credential. Most other *-key headers (X-Cache-Key, Sort-Key, X-Stripe-Publishable-Key)
 // don't, and their values then spread through the paste as copies.
@@ -30,8 +33,6 @@ const SCHEME_ANYWHERE = new RegExp(String.raw`${START}(Bearer|Basic)[ \t]+`, 'gi
 // user:password flags of curl and HTTPie (-a, --auth). Short flags take the value attached or after
 // spaces; long ones after = or spaces.
 const CURL_USER = /(?<!\S)(?:(-u|-U|-a)[ \t]*|(--user|--proxy-user|--auth)(?:=|[ \t]+))(["']?)/g;
-// HTTPie's -a is rsync's archive flag, so only on lines that run http or https.
-const HTTPIE = /(?:^|[\s;|&])https?(?=\s)/;
 // With -A bearer, HTTPie's -a takes a token instead of user:password.
 const HTTPIE_BEARER = /(?:-A|--auth-type)[ \t=]+bearer\b/i;
 // mysql takes its password attached to -p. Other tools use -p for a port, so only mysql and mariadb lines,
@@ -110,18 +111,15 @@ function curlUsers(text: string): Finding[] {
     const flag = m[1] ?? m[2]!;
     const quote = m[3]!;
     const at = m.index + m[0].length;
-    if (flag === '-a' || flag === '--auth') {
-      const line = lineAround(text, m.index);
-      if (!HTTPIE.test(line)) return [];
-      if (HTTPIE_BEARER.test(line)) return credential(text, at, 'bearer', `${flag} bearer token`);
-    }
+    const httpie = flag === '-a' || flag === '--auth';
+    if (httpie && HTTPIE_BEARER.test(lineAround(text, m.index))) return credential(text, at, 'bearer', `${flag} bearer token`);
     // A colon followed by // is a URL scheme (redis-cli -u redis://host), not user:password.
     const userPass =
       quote === '"' ? /[^":\s]*:(?!\/\/)([^"\r\n]+)/dy : quote === "'" ? /[^':\s]*:(?!\/\/)([^'\r\n]+)/dy : /[^\s:'"]*:(?!\/\/)(\S+)/dy;
     userPass.lastIndex = at;
     const u = userPass.exec(text);
-    // docker and ps take -u uid:gid.
-    if (!u || /^\d+:\d+$/.test(u[0])) return [];
+    // docker and ps take -u uid:gid, and rsync's -a (archive) is followed by host:/path.
+    if (!u || /^\d+:\d+$/.test(u[0]) || (httpie && u[1]!.startsWith('/'))) return [];
     const [start, end] = u.indices![1]!;
     return [{ start, end, kind: 'password', reason: `${flag} password` }];
   });
@@ -140,10 +138,9 @@ function curlBearers(text: string): Finding[] {
   return [...text.matchAll(CURL_BEARER)].flatMap((m) => credential(text, m.index + m[0].length, 'bearer', 'curl --oauth2-bearer'));
 }
 
-// A value followed by ( is a call, as in token = getToken().
 function credential(text: string, at: number, kind: string, reason: string, accept = (_: string) => true): Finding[] {
   const value = matchAt(CREDENTIAL, text, at);
-  if (!value || text[at + value.length] === '(' || !accept(value)) return [];
+  if (!value || (text[at + value.length] === '(' && isCallee(value)) || !accept(value)) return [];
   return [{ start: at, end: at + value.length, kind, reason }];
 }
 

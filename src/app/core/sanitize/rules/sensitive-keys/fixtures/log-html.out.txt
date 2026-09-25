@@ -1,1 +1,2 @@
 <tr><td>password=<password#1></td><td>next</td></tr>
+ADMIN_PASSWORD=<admin-password#2>

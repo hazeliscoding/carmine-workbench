@@ -3,3 +3,5 @@ orders-cli deploy --token <token#2> --api-key "<api-key#3>" --region eu-west-1
 orders-cli rotate --token-ttl 3600 --password-file ./secret.txt
 orders-cli migrate --db-pass <db-pass#4>
 docker buildx build --secret id=npmrc,src=/home/me/.npmrc .
+docker login --username deploy --password <password#5>
+tool --api-key <api-key#6>

@@ -1,2 +1,3 @@
 <p>Authorization: Bearer {{secret:Qx7mZp2Lk9vR4tW8yG1}}<br>Accept: */*</p>
 <pre>Authorization: Bearer <{{fake:jwt}}></pre>
+X-Api-Key: {{secret:k3y<0rders>api-9}}

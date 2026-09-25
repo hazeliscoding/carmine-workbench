@@ -1,5 +1,5 @@
 import { Finding, Rule } from '../../types';
-import { kindFromName, looksLikeCode } from '../shared';
+import { VALUE_STOP, isCallee, kindFromName, looksLikeCode } from '../shared';
 
 // A key, optionally quoted (escaped when the JSON sits inside a log string, or a Python b'' string) or
 // written as a --flag, then an assignment: = : := or =>. An = followed by another = is a comparison, and a
@@ -15,16 +15,18 @@ const STRING_PREFIX = /[bBrRuUfF]{1,2}(?=\\?["'`])/y;
 const QUOTED = /(["'`])((?:\\.|(?!\1)[^\\\r\n])*)(?:\1|(?=[\r\n]|$))/dy;
 // Quoted with escaped quotes, as JSON inside a log string is.
 const ESCAPED_QUOTED = /\\(["'])((?:(?!\\\1)[^\r\n])*)(?:\\\1|(?=[\r\n]|$))/dy;
-// A shell or template reference is taken whole so the engine can skip it.
-const BARE = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s,;&'"(){}[\]\\<>]+/y;
+// A shell or template reference is taken whole so the engine can skip it. A value starting with < is a tag
+// or a label.
+const BARE = new RegExp(String.raw`\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|(?!<)(?:(?!${VALUE_STOP})[^\s,;&'"(){}[\]\\])+`, 'iy');
 // Matched against the key lowercased with separators removed, so api_key, apiKey and API-KEY all match.
 // Only the plural "credentials": AWS's Credential= is a key ID and a scope.
 const SENSITIVE =
   /(?:password|passwd|passphrase|pass|secret|token|apikey|privatekey|secretkey|secretaccesskey|accountkey|signingkey|encryptionkey|masterkey|sessionid|credentials)$|^pwd$/;
 // Pagination cursors and token_type end like secrets but grant nothing, and bypass or compass only end in "pass".
 const NOT_SENSITIVE = /(?:tokentype|(?:next|page|continuation|pagination)token|bypass|compass)$/;
-// A flag value such as --secret id=npmrc,src=… is a spec that names the secret, not the secret.
-const SPEC = /^[A-Za-z_][\w-]*=(?!=)/;
+// A flag value such as docker's --secret id=npmrc,src=… is a spec that names the secret, not the secret.
+// Only these keys, because base64 with one = of padding looks the same.
+const SPEC = /^(?:id|src|source|type|env|target|dst|destination)=/;
 // A command-line flag with its value after a space, as in docker login --password …
 const FLAG = /(?<!\S)--([A-Za-z][\w-]*)[ \t]+(?=[^\s-])/g;
 // A YAML block scalar indicator (| or >, with optional chomping), the value on the lines below.
@@ -63,7 +65,8 @@ function valueOf(text: string, key: string, separator: string, from: number): Fi
   const end = at + bare.length;
   // A JSON number is a flag or a count. Code such as os.environ["X"] or os.Getenv("X") reads the
   // secret from somewhere else.
-  if ((separator === ':' && /^-?\d+(?:\.\d+)?$/.test(bare)) || /[([]/.test(text[end] ?? '') || looksLikeCode(bare)) return [];
+  const call = /[([]/.test(text[end] ?? '') && isCallee(bare);
+  if ((separator === ':' && /^-?\d+(?:\.\d+)?$/.test(bare)) || call || looksLikeCode(bare)) return [];
   return [{ start: at, end, kind, reason }];
 }
 

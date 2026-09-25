@@ -4,3 +4,4 @@ httpx headers: [(b'authorization', b'Bearer <bearer#3>')]
 {"name":"Authorization","value":"Bearer <bearer#4>"}
 AUTH_HEADER="Bearer <bearer#5>"
 Bearer tokens expire after an hour and Basic auth is disabled; the bearer of a token can call the API.
+07:19:02 WARN  Authorization: Bearer <bearer#6>(expired)

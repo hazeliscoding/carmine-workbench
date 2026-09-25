@@ -5,3 +5,4 @@ mysqldump --user=orders -p'<password#4>' orders > orders.sql
 docker run -p 8080:80 -p8443:443 registry.example.com/orders:1.14.2
 ssh -p 2222 deploy@10.0.4.17
 http -A bearer -a <bearer#5> https://api.example.com/v1/orders
+{"scripts": {"smoke": "http -a deploy:<password#6> https://api.example.com/v1/health"}}

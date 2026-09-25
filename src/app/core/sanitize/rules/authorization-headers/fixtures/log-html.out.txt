@@ -1,2 +1,3 @@
 <p>Authorization: Bearer <bearer#1><br>Accept: */*</p>
 <pre>Authorization: Bearer <<jwt#2>></pre>
+X-Api-Key: <api-key#3>
