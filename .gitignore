@@ -1,0 +1,6 @@
+# Local tool output
+.playwright-mcp/
+
+# OS files
+.DS_Store
+Thumbs.db
