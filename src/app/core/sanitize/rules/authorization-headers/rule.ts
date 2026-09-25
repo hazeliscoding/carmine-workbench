@@ -6,8 +6,8 @@ import { kindFromName } from '../names';
 // by = is an assignment in code (token := …), not a header.
 const HEADER = /(?<![\w-])(["']?)([A-Za-z][\w-]*)\1[ \t]*:(?!=)[ \t]*["']?/g;
 // A shell or template reference is taken whole so the engine can skip it; anything else runs up to
-// whitespace, a quote or a delimiter that can follow a value in JSON, dict or log output.
-const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'",;})\]]+/y;
+// whitespace, a quote, a delimiter or a bracket. A value that opens an object or array isn't a credential.
+const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'",;{}()[\]]+/y;
 const SCHEME = /[A-Za-z][\w-]*[ \t]+(?=\S)/y;
 const KEY_HEADER = /(?:^|-)(?:api-?key|token|secret)$|-key$/;
 const NOT_KEY_HEADER = /^(?:idempotency-key|sec-websocket-key)$|(?:page|next|continuation)-token$/;
