@@ -45,4 +45,5 @@ The product's promise is only as good as these rules. Never break them, not even
 - **Checks:** automate acceptance checks instead of handing manual steps to the owner. Give every check that tests for an absence a positive control. For example, the network guard must fail on a deliberate `fetch(`.
 - **Validation:** evidence comes from dogfooding (the log) and public async signals (issues, PRs, downloads). Don't plan interviews, recruiting or outreach.
 - **Docs:** short and concise. Prefer editing `ROADMAP.md` over creating new planning documents.
+- **Code comments:** explain why, not what. Only comment on what the code can't say for itself: a non-obvious constraint, a workaround and its cause, what a regex is meant to match, or a line that keeps the privacy contract. Don't restate names or types, don't add boilerplate JSDoc, and don't leave commented-out code or change notes. If code needs a comment to say what it does, rename or split it first. A rule's fixtures are its documentation.
 - Local Playwright output goes to `.playwright-mcp/`, which git ignores.
