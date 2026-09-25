@@ -35,10 +35,9 @@ export function sanitize(input: string, rules: readonly Rule[] = RULES): Sanitiz
   // Which taken finding (by index) or copy covers each character of the input.
   const owner = new Int32Array(input.length).fill(FREE);
   const taken = resolveOverlaps(input, findAll(input, rules), owner);
-  const spans: Span[] = [
-    ...taken.map((hit) => ({ start: hit.start, end: hit.end, value: hit.value, hit })),
-    ...findCopies(input, taken, owner),
-  ];
+  // Before the spans are read, because a copy can widen a taken span.
+  const copies = findCopies(input, taken, owner);
+  const spans: Span[] = [...taken.map((hit) => ({ start: hit.start, end: hit.end, value: hit.value, hit })), ...copies];
   spans.sort((a, b) => a.start - b.start);
 
   const firstHit = new Map<string, Hit>();
@@ -121,32 +120,57 @@ function resolveOverlaps(input: string, hits: Hit[], owner: Int32Array): Hit[] {
 }
 
 // Scans once. Values often share a prefix (every JWT starts eyJhbGci), so a prefix leads to the lengths
-// worth trying rather than to every value.
+// worth trying rather than to every value. Text that a merge replaced around a value counts as a copy of
+// that value too, so it goes wherever it repeats, even around a finding of the same value.
 function findCopies(input: string, taken: Hit[], owner: Int32Array): Span[] {
-  const values = new Set(taken.map((hit) => hit.value).filter((value) => value.length >= MIN_COPY_LENGTH));
+  const valueOfText = new Map<string, string>();
+  for (const t of taken) {
+    const merged = input.slice(t.start, t.end);
+    if (merged !== t.value && merged.length >= MIN_COPY_LENGTH) valueOfText.set(merged, t.value);
+  }
+  const anyMerged = valueOfText.size > 0;
+  for (const t of taken) if (t.value.length >= MIN_COPY_LENGTH) valueOfText.set(t.value, t.value);
+
   const lengthsByPrefix = new Map<string, number[]>();
-  for (const value of values) {
-    const prefix = value.slice(0, MIN_COPY_LENGTH);
+  for (const text of valueOfText.keys()) {
+    const prefix = text.slice(0, MIN_COPY_LENGTH);
     const lengths = lengthsByPrefix.get(prefix) ?? [];
-    if (!lengths.includes(value.length)) lengthsByPrefix.set(prefix, [...lengths, value.length].sort((a, b) => b - a));
+    if (!lengths.includes(text.length)) lengthsByPrefix.set(prefix, [...lengths, text.length].sort((a, b) => b - a));
   }
   const copies: Span[] = [];
-  if (values.size === 0) return copies;
-  const isFree = (start: number, end: number) => owner.subarray(start, end).every((id) => id === FREE);
+  // A copy goes on free text, or widens a taken finding of the same value that it covers.
+  const place = (start: number, end: number, value: string) => {
+    const ids = new Set(owner.subarray(start, end));
+    ids.delete(FREE);
+    if (ids.size === 0) {
+      owner.fill(COPY, start, end);
+      copies.push({ start, end, value });
+      return true;
+    }
+    const [id] = ids;
+    if (ids.size > 1 || id === COPY || taken[id!]!.value !== value) return false;
+    const t = taken[id!]!;
+    owner.fill(id!, start, end);
+    t.start = Math.min(t.start, start);
+    t.end = Math.max(t.end, end);
+    return true;
+  };
+  if (valueOfText.size === 0) return copies;
   for (let at = 0; at + MIN_COPY_LENGTH <= input.length; at++) {
-    if (owner[at] !== FREE) continue;
-    const lengths = lengthsByPrefix.get(input.slice(at, at + MIN_COPY_LENGTH));
-    const length = lengths?.find((n) => values.has(input.slice(at, at + n)) && isFree(at, at + n));
-    if (length === undefined) continue;
-    owner.fill(COPY, at, at + length);
-    copies.push({ start: at, end: at + length, value: input.slice(at, at + length) });
-    at += length - 1;
+    if (!anyMerged && owner[at] !== FREE) continue;
+    const lengths = lengthsByPrefix.get(input.slice(at, at + MIN_COPY_LENGTH)) ?? [];
+    const length = lengths.find((n) => {
+      const value = at + n <= input.length ? valueOfText.get(input.slice(at, at + n)) : undefined;
+      return value !== undefined && place(at, at + n, value);
+    });
+    if (length !== undefined) at += length - 1;
   }
   return copies;
 }
 
+// A loop rather than indexOf, which would scan to the end of a long line for every change.
 function countNewlines(text: string, from: number, to: number): number {
   let n = 0;
-  for (let i = text.indexOf('\n', from); i !== -1 && i < to; i = text.indexOf('\n', i + 1)) n++;
+  for (let i = from; i < to; i++) if (text.charCodeAt(i) === 10) n++;
   return n;
 }

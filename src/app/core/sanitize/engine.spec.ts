@@ -83,6 +83,24 @@ describe('sanitize', () => {
     expect(sanitize(once, rules).output).toBe(once);
   });
 
+  it('replaces the merged text wherever it repeats, not only the specific value', () => {
+    const cookie = rule('cookie', 'context', /auth=(\S+)/dg, 'cookie:auth');
+    const input = 'auth=tok_aaaaaaaa|s3cr3tvalue\nretry tok_aaaaaaaa|s3cr3tvalue';
+    expect(sanitize(input, [cookie, token]).output).toBe('auth=<token#1>\nretry <token#1>');
+  });
+
+  it('keeps a copy span inside the input when a longer value shares its start', () => {
+    const result = sanitize('key=s3cr3tvalueLONGER\nkey=s3cr3tvalue\nlog s3cr3tvalue', [kv]);
+    expect(result.changes.map((c) => [c.start, c.end]).at(-1)).toEqual([42, 53]);
+  });
+
+  it('keeps up with a 2 MB input on a single line', () => {
+    const input = Array.from({ length: 80_000 }, (_, i) => `key=s3cr3t${i.toString(16).padStart(8, '0')}`).join(' ');
+    const started = performance.now();
+    expect(sanitize(input, [kv]).changes.length).toBe(80_000);
+    expect(performance.now() - started).toBeLessThan(3000);
+  });
+
   it('keeps up with a 1 MB input full of findings', () => {
     const input = Array.from({ length: 40_000 }, (_, i) => `key=s3cr3t${i.toString(16).padStart(8, '0')}`).join('\n');
     const started = performance.now();
