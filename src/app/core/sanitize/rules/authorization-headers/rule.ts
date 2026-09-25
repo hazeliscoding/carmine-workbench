@@ -1,8 +1,9 @@
 import { Finding, Rule } from '../../types';
 
 // A header name, optionally quoted as a JSON or Python key, then a colon and an optional opening quote.
-// It matches only up to the value, so the next header on the same line is still found.
-const HEADER = /(?<![\w-])(["']?)([A-Za-z][\w-]*)\1[ \t]*:[ \t]*["']?/g;
+// It matches only up to the value, so the next header on the same line is still found. A colon followed
+// by = is an assignment in code (token := …), not a header.
+const HEADER = /(?<![\w-])(["']?)([A-Za-z][\w-]*)\1[ \t]*:(?!=)[ \t]*["']?/g;
 // A shell or template reference is taken whole so the engine can skip it; anything else runs up to
 // whitespace, a quote or a delimiter that can follow a value in JSON, dict or log output.
 const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'",;})\]]+/y;
