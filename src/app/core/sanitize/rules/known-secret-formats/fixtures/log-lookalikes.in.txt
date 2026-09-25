@@ -1,0 +1,4 @@
+Stripe publishable keys such as pk_live_51Hx9exampleexampleexample are safe to embed in a page.
+07:19:02 INFO  ghp_ is the prefix for GitHub personal access tokens; xoxb- is a Slack bot token.
+07:19:02 INFO  AKIAEXAMPLE-group owns i-0123456789abcdef0
+Google API keys start with AIzaSy and OAuth access tokens with ya29.

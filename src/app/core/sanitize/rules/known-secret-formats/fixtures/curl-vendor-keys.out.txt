@@ -1,0 +1,4 @@
+curl https://api.github.com/repos/example/orders/actions/runs -H 'Authorization: token <github-token#1>'
+curl https://api.stripe.com/v1/charges -u <stripe-key#2>: -d amount=2000 -d currency=eur
+curl 'https://maps.googleapis.com/maps/api/geocode/json?address=Berlin&key=<google-api-key#3>'
+curl -X POST -H 'Content-type: application/json' --data '{"text":"deploy done"}' https://hooks.slack.com/services/<slack-webhook#4>

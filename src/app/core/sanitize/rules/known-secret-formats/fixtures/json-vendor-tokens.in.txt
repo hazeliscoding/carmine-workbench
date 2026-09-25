@@ -1,0 +1,2 @@
+{"ok":false,"error":"not_authed","token":"{{fake:slack-token}}","warning":"missing_charset"}
+{"client":"orders","access_token":"{{fake:google-token}}","expires_in":3599,"token_type":"Bearer"}

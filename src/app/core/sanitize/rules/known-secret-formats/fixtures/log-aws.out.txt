@@ -1,0 +1,5 @@
+07:19:02 ERROR botocore ClientError: InvalidAccessKeyId <aws-access-key-id#1> in us-east-1
+$ cat ~/.aws/credentials
+[default]
+aws_access_key_id = <aws-access-key-id#2>
+aws_secret_access_key = <aws-secret-access-key#3>
