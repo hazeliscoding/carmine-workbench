@@ -1,0 +1,12 @@
+POST /oauth/token HTTP/1.1
+Host: auth.example.com
+Authorization: Basic {{secret:b3JkZXJzLWNsaTpzM2NyM3Q=}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&scope=orders%3Aread
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Set-Cookie: __cf_bm={{secret:Qm2xT9kLp4wZr8v.1790234340-1.0.1.1}}; path=/; HttpOnly
+
+{"access_token":"{{fake:jwt}}","token_type":"Bearer","expires_in":3600}
