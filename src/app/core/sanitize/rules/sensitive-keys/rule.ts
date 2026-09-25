@@ -1,5 +1,5 @@
 import { Finding, Rule } from '../../types';
-import { kindFromName } from '../shared';
+import { kindFromName, looksLikeCode } from '../shared';
 
 // A key, optionally quoted (escaped when the JSON sits inside a log string, or a Python b'' string) or
 // written as a --flag, then an assignment: = : := or =>. An = followed by another = is a comparison, and a
@@ -60,7 +60,7 @@ function valueOf(text: string, key: string, separator: string, from: number): Fi
   const end = at + bare.length;
   // A JSON number is a flag or a count. Code such as os.environ["X"] or os.Getenv("X") reads the
   // secret from somewhere else.
-  if ((separator === ':' && /^-?\d+(?:\.\d+)?$/.test(bare)) || /[([]/.test(text[end] ?? '')) return [];
+  if ((separator === ':' && /^-?\d+(?:\.\d+)?$/.test(bare)) || /[([]/.test(text[end] ?? '') || looksLikeCode(bare)) return [];
   return [{ start: at, end, kind, reason }];
 }
 

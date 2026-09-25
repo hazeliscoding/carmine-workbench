@@ -1,0 +1,7 @@
+const token = await getToken();
+const password = form.value.password;
+if (!password) throw new Error('password required');
+let secret = this.configuration.secret;
+interface Login { user: string; password: string; token?: string }
+def login(password: str, token: Optional[str] = None): ...
+val apiKey: String = BuildConfig.API_KEY

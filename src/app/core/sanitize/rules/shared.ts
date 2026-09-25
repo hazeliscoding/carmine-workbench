@@ -16,5 +16,14 @@ export function kindFromName(name: string): string {
 
 // For values whose name alone isn't proof, so prose such as "Authorization: denied for usr_034" stays.
 export function looksLikeCredential(value: string): boolean {
-  return (value.length >= 8 && /\d/.test(value)) || value.length >= 20;
+  return !looksLikeCode(value) && ((value.length >= 8 && /\d/.test(value)) || value.length >= 20);
+}
+
+// Code that reads a secret instead of holding one: const token = await getToken(), password: string,
+// this.configuration.secret. Real tokens carry digits or dashes in their dotted parts.
+export function looksLikeCode(value: string): boolean {
+  return (
+    /^(?:await|new|typeof|function|async|require|import|return|yield|string|number|boolean|any|unknown|never|void|object|str|int|float|bool|bytes|dict|list)$/i.test(value) ||
+    /^[A-Za-z_$]+(?:\.[A-Za-z_$]+)+$/.test(value)
+  );
 }
