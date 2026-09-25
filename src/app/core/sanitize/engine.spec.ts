@@ -93,6 +93,11 @@ describe('sanitize', () => {
     },
   );
 
+  it.each(['null', 'undefined', 'true', 'False', 'None', 'nil'])('leaves the empty value %s alone', (empty) => {
+    const input = `Auth: Bearer ${empty}`;
+    expect(sanitize(input, [header]).output).toBe(input);
+  });
+
   it('keeps CRLF line endings and counts lines across them', () => {
     const result = sanitize('a\r\nb\r\nAuth: Bearer s3cr3tvalue\r\n', [header]);
     expect(result.output).toBe('a\r\nb\r\nAuth: Bearer <bearer#1>\r\n');

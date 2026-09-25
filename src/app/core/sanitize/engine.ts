@@ -5,9 +5,9 @@ import { Change, DecodedJwt, LabeledJwt, Rule, SanitizeResult } from './types';
 const MIN_COPY_LENGTH = 8;
 
 // Values that point at a secret instead of holding one: shell and Windows variables, command substitution,
-// template variables, placeholders, masks, and labels from an earlier pass.
+// template variables, placeholders, masks, and labels from an earlier pass. Also values that hold nothing.
 const REFERENCE =
-  /^(?:\$\w+|\$\{[^}]*\}|\$\([^)]*\)|%\w+%|\{\{[^}]*\}\}|<[^<>]+>|\*+|\[(?:redacted|filtered|hidden|masked|removed)\])$/i;
+  /^(?:\$\w+|\$\{[^}]*\}|\$\([^)]*\)|%\w+%|\{\{[^}]*\}\}|<[^<>]+>|\*+|\[(?:redacted|filtered|hidden|masked|removed)\]|null|undefined|true|false|none|nil)$/i;
 
 interface Hit {
   rule: string;
