@@ -60,6 +60,7 @@ const FAKES: Record<string, (n: number) => string> = {
   'github-token': (n) => 'gh' + 'p_' + chars(`gh${n}`, 36),
   'stripe-key': (n) => ['sk', 'live', chars(`stripe${n}`, 24)].join('_'),
   'slack-token': (n) => ['xo' + 'xb', chars(`sa${n}`, 12, DIGITS), chars(`sb${n}`, 12, DIGITS), chars(`sc${n}`, 24)].join('-'),
+  'slack-refresh-token': (n) => ['xo' + 'xe', '1', chars(`sr${n}`, 60)].join('-'),
   // The path after https://hooks.slack.com/services/, which is the secret part of the URL.
   'slack-webhook': (n) => `T${chars(`wa${n}`, 8, UPPER + DIGITS)}/B${chars(`wb${n}`, 10, UPPER + DIGITS)}/${chars(`wc${n}`, 24)}`,
   'google-api-key': (n) => 'AI' + 'za' + chars(`gk${n}`, 35, B64URL),

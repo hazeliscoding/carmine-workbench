@@ -1,0 +1,6 @@
+{"msg":"calling GitHub with\n<github-token#1>"}
+07:19:02 INFO  GET /maps?q=Berlin%26key%3D<google-api-key#2>
+07:19:02 INFO  header Authorization%3A%20token%20<github-token#3>
+{"msg":"slack says\t<slack-token#4>"}
+07:19:02 INFO  X-Amz-Credential=%3D<aws-access-key-id#5>%2F20260924%2Fus-east-1%2Fs3%2Faws4_request
+07:19:03 INFO  slack rotated the app token to <slack-token#6>
