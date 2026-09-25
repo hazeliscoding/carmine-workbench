@@ -16,6 +16,8 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 
 - **Fonts** come from Fontsource packages and are bundled into the app, with their OFL licenses under `licenses/`. Source Serif 4 is dropped, because Carmine has no personal voice.
 - **Colors** keep the directive//01 palette. Five tokens changed to pass WCAG 2.2 AA on every surface the UI uses, not only the page. The `AA` notes in `src/styles/tokens.css` give the old values, and `scripts/check-contrast.mjs` checks each pair in CI.
+- **HTTP crates** are checked with `cargo tree` for the three desktop targets. `Cargo.lock` also lists crates for mobile, where tauri pulls in `reqwest`, so scanning it gives false positives.
+- **CI** builds on Linux only until the M2 release workflow adds Windows and macOS.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -27,7 +29,7 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
   - [x] Drop the Lucide icons loaded from a CDN.
   - [x] Fix the colors that fail WCAG AA: light `--text-meta` (3.96), light `--amber` (3.35), dark `--directive-red` (3.42) and the dark focus ring (2.49).
 - [x] Build a static Sanitize screen with a canned sample: findings list, input, sanitized output with diff, JWT panel, and a `LOCAL · NO NETWORK` status bar.
-- [ ] Turn on the privacy guardrails from the first commit:
+- [x] Turn on the privacy guardrails from the first commit:
   - [x] a Content Security Policy that blocks outbound connections;
   - [x] no HTTP or updater plugins;
   - [x] a CI check that fails on `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or `sendBeacon` in `src/`, and on HTTP crates in `src-tauri/`.

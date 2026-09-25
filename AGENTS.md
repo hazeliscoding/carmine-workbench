@@ -6,7 +6,7 @@ These are the working rules for agents in this repo. Carmine Workbench is a loca
 
 - `README.md`: the pitch and the privacy contract.
 - `ROADMAP.md`: decisions already made, the milestones, and what is out of scope. Check it before proposing features. Respect those decisions unless the owner reopens them.
-- The repo is still in planning. Don't build past the current milestone without asking.
+- Work from the next unchecked item in `ROADMAP.md`. Don't build past the current milestone without asking.
 
 ## The privacy contract (hard rules)
 
@@ -29,6 +29,7 @@ The product's promise is only as good as these rules. Never break them, not even
 ## UI and copy
 
 - The UI follows the directive//01 design system, adapted: self-hosted fonts, theme from `prefers-color-scheme`, and colors corrected to pass WCAG 2.2 AA.
+- Tokens live in `src/styles/tokens.css`. When the UI puts a new text or focus color on a surface, add the pair to `PAIRS` in `scripts/check-contrast.mjs`.
 - Voice is calm, short and declarative. No exclamation marks, no emoji. Never tell the user output is "clean". Say "4 secrets removed, review before sharing".
 - Dates are written `2026.09.24` and times use the 24-hour clock.
 
@@ -37,6 +38,13 @@ The product's promise is only as good as these rules. Never break them, not even
 - The assets are in `docs/brand/`. `-dark` files are for dark backgrounds.
 - The wordmark is Barlow Semi Condensed SemiBold, uppercase, with 0.08em letter spacing, converted to vector paths. Use the SVGs; don't re-typeset the wordmark with a web font.
 - App icons need the mark on a paper-colored tile (`#f2ede2`), because the dark strokes disappear on dark taskbars.
+
+## Commands
+
+- `npm start` serves the UI in a browser. `npm run tauri dev` runs the desktop app.
+- `npm test -- --watch=false` runs the unit tests.
+- `node --test "scripts/*.test.mjs"`, `node scripts/check-network.mjs` and `node scripts/check-contrast.mjs` are the CI checks and their positive controls.
+- `npm run tauri build -- --no-bundle` builds the release binary without installers.
 
 ## Working style
 
