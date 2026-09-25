@@ -1,0 +1,4 @@
+07:19:02 INFO  GET /cb?code={{secret:4/0AeaYSHDfakeAuthCode_x8Kd}}&state=af0ifjsldkj&scope=openid 302
+07:19:02 INFO  redirect https://app.example.com/cb#access_token={{secret:SlAV32hkKGfakeImplicit}}&token_type=Bearer&expires_in=3600&state=xyz
+07:19:03 DEBUG presigned https://orders-exports.s3.amazonaws.com/2026/09/orders.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260924T071902Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature={{secret:4a8b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b}}
+07:19:03 DEBUG blob https://orders.blob.core.windows.net/exports/orders.csv?sv=2026-01-01&se=2026-09-24T08%3A19Z&sr=b&sp=r&sig={{secret:Xk9fP2mQ7vL4nR8sT1wY6zB3%2Bq%3D}}

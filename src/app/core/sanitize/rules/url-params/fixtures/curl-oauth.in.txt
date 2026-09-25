@@ -1,0 +1,4 @@
+curl 'https://auth.example.com/oauth/token' \
+  -d 'grant_type=authorization_code&code={{secret:SplxlOBeZQQYbYS6WxSbIA}}&redirect_uri=https%3A%2F%2Fapp.example.com%2Fcb' \
+  -d 'client_id=orders-cli&client_secret={{secret:7Fjfp0ZBr1KtDRbnfVdmIw}}'
+curl "https://api.example.com/v1/orders?page=2&access_token={{secret:mF_9B5f4-1JqM8zK}}"

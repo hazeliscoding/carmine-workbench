@@ -1,0 +1,4 @@
+curl https://deploy:<password#1>@registry.example.com/v2/_catalog
+git clone https://oauth2:<password#2>@gitlab.example.com/orders/api.git
+psql "postgres://orders:<password#3>@db.internal:5432/orders?sslmode=require"
+redis-cli -u redis://:<password#4>@cache.internal:6379/0

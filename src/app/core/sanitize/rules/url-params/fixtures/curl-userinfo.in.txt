@@ -1,0 +1,4 @@
+curl https://deploy:{{secret:hunter2-staging}}@registry.example.com/v2/_catalog
+git clone https://oauth2:{{secret:glp4t-Fak3T0kenForFixtures}}@gitlab.example.com/orders/api.git
+psql "postgres://orders:{{secret:pg-s3cret-pass}}@db.internal:5432/orders?sslmode=require"
+redis-cli -u redis://:{{secret:r3dis-auth-pass}}@cache.internal:6379/0
