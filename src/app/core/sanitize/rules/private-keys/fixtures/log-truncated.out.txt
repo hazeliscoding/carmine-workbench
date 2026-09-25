@@ -1,0 +1,3 @@
+The key file starts like this, then ssh says "invalid format":
+<private-key#1>
+Permissions are 600 and the path is ~/.ssh/orders_deploy.

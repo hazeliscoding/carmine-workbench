@@ -36,10 +36,10 @@ function jwt(header: object, n: number, signature: string): string {
   return `${base64url(header)}.${base64url(claims)}.${signature}`;
 }
 
-function pem(type: string, n: number, newline: string): string {
+function pem(type: string, n: number, newline: string, withEnd = true): string {
   const armor = (edge: string) => `-----${edge} ${type}PRIVATE KEY-----`;
   const body = chars(`pem${type}${n}`, 300, B64).match(/.{1,64}/g)!;
-  return [armor('BEGIN'), ...body, armor('END')].join(newline);
+  return [armor('BEGIN'), ...body, ...(withEnd ? [armor('END')] : [])].join(newline);
 }
 
 const FAKES: Record<string, (n: number) => string> = {
@@ -48,6 +48,10 @@ const FAKES: Record<string, (n: number) => string> = {
   'private-key': (n) => pem('RSA ', n, '\n'),
   // As it sits inside a JSON string, such as a Google service-account file: newlines escaped as \n.
   'private-key-json': (n) => pem('', n, '\\n'),
+  // Indented under a YAML key.
+  'private-key-yaml': (n) => pem('EC ', n, '\n    '),
+  // Pasted without its END line.
+  'private-key-truncated': (n) => pem('OPENSSH ', n, '\n', false),
   'aws-access-key-id': (n) => 'AK' + 'IA' + chars(`aws${n}`, 16, UPPER + DIGITS),
   'aws-secret-access-key': (n) => chars(`awss${n}`, 40, B64),
   'github-token': (n) => 'gh' + 'p_' + chars(`gh${n}`, 36),

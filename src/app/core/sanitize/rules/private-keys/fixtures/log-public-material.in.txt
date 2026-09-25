@@ -1,0 +1,9 @@
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEexampleexampleexampleexampleexampleexample
+-----END PUBLIC KEY-----
+-----BEGIN CERTIFICATE-----
+MIIBszCCAVmgAwIBAgIUexampleexampleexampleexample
+-----END CERTIFICATE-----
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExampleExampleExampleExampleExample deploy@orders
+docs: never paste a "-----BEGIN PRIVATE KEY-----" block into a ticket.
+docs: a key starts with "-----BEGIN RSA PRIVATE KEY-----" and ends with "-----END RSA PRIVATE KEY-----".

@@ -1,0 +1,5 @@
+tls:
+  cert: /etc/orders/tls.crt
+  key: |
+    {{fake:private-key-yaml}}
+  minVersion: TLS1.2

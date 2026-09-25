@@ -1,0 +1,3 @@
+The key file starts like this, then ssh says "invalid format":
+{{fake:private-key-truncated}}
+Permissions are 600 and the path is ~/.ssh/orders_deploy.
