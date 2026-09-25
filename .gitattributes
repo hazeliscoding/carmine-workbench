@@ -1,2 +1,5 @@
 # Normalize to LF everywhere. Sanitize fixtures are compared byte-for-byte.
 * text=auto eol=lf
+
+# Raw HTTP fixtures keep their CRLF bytes.
+src/app/core/sanitize/**/fixtures/*.crlf.* -text
