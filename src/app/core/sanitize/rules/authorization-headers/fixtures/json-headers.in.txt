@@ -1,0 +1,2 @@
+{"method":"POST","url":"https://api.example.com/v1/orders","headers":{"Authorization":"Bearer {{secret:7Qm2xT9kLp4wZr8v}}","X-Auth-Token":"{{secret:a8f5f167f44f4964e6c998dee827110c}}","Content-Type":"application/json"}}
+requests.post(url, headers={'authorization': 'token {{secret:0123456789abcdef0123}}', 'x-api-key': '{{secret:k3y-f0r-0rders-api}}'})

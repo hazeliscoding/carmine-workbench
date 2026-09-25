@@ -1,0 +1,7 @@
+GET /v1/orders HTTP/1.1
+Host: api.example.com
+Authorization: Basic {{secret:ZGVwbG95Omh1bnRlcjItc3RhZ2luZw==}}
+Proxy-Authorization: Bearer {{secret:pr0xyT0ken5678}}
+X-Amz-Security-Token: {{secret:FQoGZXIvYXdzFakeSessionToken0123456789}}
+Accept: application/json
+

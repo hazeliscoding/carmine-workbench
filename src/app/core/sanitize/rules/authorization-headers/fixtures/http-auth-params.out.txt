@@ -1,0 +1,4 @@
+Authorization: Digest username="deploy", realm="registry", nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093", uri="/v2/_catalog", response="<digest#1>", opaque="5ccc069c403ebaf9f0171e9517f40e41"
+Authorization: AWS4-HMAC-SHA256 Credential=EXAMPLEKEYID/20260924/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-date, Signature=<aws-signature#2>
+Authorization: OAuth oauth_consumer_key="orders-cli", oauth_token="<oauth#3>", oauth_signature_method="HMAC-SHA1", oauth_signature="<oauth#4>"
+Authorization: Token token="<token#5>", app="orders"

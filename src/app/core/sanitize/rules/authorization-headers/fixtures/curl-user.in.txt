@@ -1,0 +1,5 @@
+curl -u 'deploy:{{secret:hunter2-staging}}' https://registry.example.com/v2/_catalog
+curl --user admin:{{secret:Tr0ub4dor&3}} --proxy-user proxy:{{secret:c0rrect-h0rse}} https://intranet.example.com/
+curl -u"ci:{{secret:pa ss:w0rd}}" https://ci.example.com/api/json
+curl --oauth2-bearer {{secret:mF_9.B5f-4.1JqM}} https://api.example.com/v1/me
+curl -u deploy https://registry.example.com/v2/

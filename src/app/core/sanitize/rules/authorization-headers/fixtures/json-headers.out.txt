@@ -1,0 +1,2 @@
+{"method":"POST","url":"https://api.example.com/v1/orders","headers":{"Authorization":"Bearer <bearer#1>","X-Auth-Token":"<auth-token#2>","Content-Type":"application/json"}}
+requests.post(url, headers={'authorization': 'token <token#3>', 'x-api-key': '<api-key#4>'})

@@ -1,0 +1,5 @@
+curl -u 'deploy:<password#1>' https://registry.example.com/v2/_catalog
+curl --user admin:<password#2> --proxy-user proxy:<password#3> https://intranet.example.com/
+curl -u"ci:<password#4>" https://ci.example.com/api/json
+curl --oauth2-bearer <bearer#5> https://api.example.com/v1/me
+curl -u deploy https://registry.example.com/v2/
