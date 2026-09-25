@@ -1,0 +1,1 @@
+07:19:02 DEBUG connecting Server=tcp:db.internal,1433;User ID=orders;Password=<password#1>;Encrypt=true

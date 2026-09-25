@@ -22,7 +22,7 @@ const NAMES = [
 ];
 // A parameter at the start of a query, fragment or form body, or after a separator. Requiring one of these
 // before the name keeps logfmt such as "status code=500" out.
-const PARAM = new RegExp(`(?<=^|[?&#;'"])(${NAMES.join('|')})=([^\\s&#'"<>)\\]]+)`, 'dgim');
+const PARAM = new RegExp(`(?<=^|[?&#;'"])(${NAMES.join('|')})=([^\\s&#;'"<>)\\]]+)`, 'dgim');
 // scheme://user:password@host. The user name stays.
 const USERINFO = /\b[a-z][a-z\d+.-]*:\/\/[^\s/:@'"]*:([^\s/@'"]+)@/dgi;
 
