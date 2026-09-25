@@ -1,0 +1,6 @@
+HTTP/1.1 200 OK
+X-Cache-Key: /v1/orders?page=2
+Sort-Key: created_at
+X-Primary-Key: order_id
+X-Stripe-Publishable-Key: pk_live_51Hx9exampleexampleexample
+GET /v1/orders?page=2 200 12ms

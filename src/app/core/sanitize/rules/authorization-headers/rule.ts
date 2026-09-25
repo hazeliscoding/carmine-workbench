@@ -14,7 +14,9 @@ const HEADER = new RegExp(
 // credential.
 const CREDENTIAL = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s'"`,;{}()[\]\\]+/y;
 const SCHEME = /[A-Za-z][\w-]*[ \t]+(?=\S)/y;
-const KEY_HEADER = /(?:^|-)(?:api-?key|token|secret)$|-key$/;
+// Names that hold a credential. Most other *-key headers (X-Cache-Key, Sort-Key, X-Stripe-Publishable-Key)
+// don't, and their values then spread through the paste as copies.
+const KEY_HEADER = /(?:^|-)(?:api-?key|access-key|auth-key|functions-key|subscription-key|token|secret)$/;
 const NOT_KEY_HEADER = /^(?:idempotency-key|sec-websocket-key)$|(?:page|next|continuation)-token$/;
 const SCHEMES = new Set(['bearer', 'basic', 'token', 'bot', 'ssws', 'apikey', 'api-key', 'key', 'negotiate', 'ntlm', 'hmac', 'dpop', 'jwt', 'sharedkey', 'mac']);
 // Schemes whose credentials are name=value parameters. Only these parameters carry the secret.
@@ -38,7 +40,9 @@ function headers(text: string): Finding[] {
     const at = m.index + m[0].length;
     const reason = `${name} header`;
     if (lower === 'authorization' || lower === 'proxy-authorization') return authorization(text, at, reason);
-    if (KEY_HEADER.test(lower) && !NOT_KEY_HEADER.test(lower)) return credential(text, at, kindFromName(name), reason);
+    if (KEY_HEADER.test(lower) && !NOT_KEY_HEADER.test(lower)) {
+      return credential(text, at, kindFromName(name), reason, looksLikeCredential);
+    }
     return [];
   });
 }
