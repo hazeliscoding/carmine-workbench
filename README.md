@@ -11,7 +11,12 @@ When an integration breaks, you paste curl commands, headers, logs and tokens in
 
 Carmine removes what grants access, keeps what helps debugging, and shows you every change. It has no networking code.
 
-> **Status:** planning. There is nothing to install yet. See [ROADMAP.md](ROADMAP.md).
+> **Status:** early development. The screen below shows a canned sample, and there is nothing to install yet. See [ROADMAP.md](ROADMAP.md).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+  <img alt="The Sanitize screen: three findings on the left, the curl input with its secrets marked, the sanitized output as a diff, and the decoded JWT" src="docs/screenshot-light.png">
+</picture>
 
 ## Before and after
 
