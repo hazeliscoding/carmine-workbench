@@ -57,8 +57,9 @@ function params(text: string, from: number, kind: string, reason: string): Findi
 function curlUsers(text: string): Finding[] {
   return [...text.matchAll(CURL_USER)].flatMap((m) => {
     const quote = m[3]!;
+    // A colon followed by // is a URL scheme (redis-cli -u redis://host), not user:password.
     const userPass =
-      quote === '"' ? /[^":\s]*:([^"\r\n]+)/dy : quote === "'" ? /[^':\s]*:([^'\r\n]+)/dy : /[^\s:'"]*:(\S+)/dy;
+      quote === '"' ? /[^":\s]*:(?!\/\/)([^"\r\n]+)/dy : quote === "'" ? /[^':\s]*:(?!\/\/)([^'\r\n]+)/dy : /[^\s:'"]*:(?!\/\/)(\S+)/dy;
     userPass.lastIndex = m.index + m[0].length;
     const u = userPass.exec(text);
     // docker and ps take -u uid:gid.
