@@ -20,9 +20,11 @@ const BARE = /\$\([^)]*\)|\$\{[^}]*\}|\{\{[^}]*\}\}|[^\s,;&'"(){}[\]\\]+/y;
 // Matched against the key lowercased with separators removed, so api_key, apiKey and API-KEY all match.
 // Only the plural "credentials": AWS's Credential= is a key ID and a scope.
 const SENSITIVE =
-  /(?:password|passwd|passphrase|secret|token|apikey|privatekey|secretkey|secretaccesskey|accountkey|signingkey|encryptionkey|masterkey|sessionid|credentials)$|^(?:pwd|pass)$/;
-// Pagination cursors and token_type end like secrets but grant nothing.
-const NOT_SENSITIVE = /(?:tokentype|(?:next|page|continuation|pagination)token)$/;
+  /(?:password|passwd|passphrase|pass|secret|token|apikey|privatekey|secretkey|secretaccesskey|accountkey|signingkey|encryptionkey|masterkey|sessionid|credentials)$|^pwd$/;
+// Pagination cursors and token_type end like secrets but grant nothing, and bypass or compass only end in "pass".
+const NOT_SENSITIVE = /(?:tokentype|(?:next|page|continuation|pagination)token|bypass|compass)$/;
+// A flag value such as --secret id=npmrc,src=… is a spec that names the secret, not the secret.
+const SPEC = /^[A-Za-z_][\w-]*=(?!=)/;
 // A command-line flag with its value after a space, as in docker login --password …
 const FLAG = /(?<!\S)--([A-Za-z][\w-]*)[ \t]+(?=[^\s-])/g;
 // A YAML block scalar indicator (| or >, with optional chomping), the value on the lines below.
@@ -53,11 +55,11 @@ function valueOf(text: string, key: string, separator: string, from: number): Fi
   const quoted = ESCAPED_QUOTED.exec(text) ?? QUOTED.exec(text);
   if (quoted) {
     const [start, end] = quoted.indices![2]!;
-    return end > start ? [{ start, end, kind, reason }] : [];
+    return end > start && !(separator === ' ' && SPEC.test(quoted[2]!)) ? [{ start, end, kind, reason }] : [];
   }
   BARE.lastIndex = at;
   const bare = BARE.exec(text)?.[0];
-  if (!bare) return [];
+  if (!bare || (separator === ' ' && SPEC.test(bare))) return [];
   const end = at + bare.length;
   // A JSON number is a flag or a count. Code such as os.environ["X"] or os.Getenv("X") reads the
   // secret from somewhere else.

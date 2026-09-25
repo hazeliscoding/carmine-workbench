@@ -9,3 +9,4 @@ $ cat ~/.aws/credentials
 aws_secret_access_key = <aws-secret-access-key#4>
 region = us-east-1
 07:19:02 INFO  login ok user=usr_034 password=<password#5> session_id=<session-id#6> max_tokens=1024
+SMTP_PASS=<smtp-pass#7>
