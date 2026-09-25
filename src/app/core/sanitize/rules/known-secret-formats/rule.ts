@@ -16,7 +16,12 @@ const format = (kind: string, reason: string, body: string): Format => ({
 
 // Stripe pk_ keys are publishable and left alone.
 const FORMATS: Format[] = [
-  format('aws-access-key-id', 'AWS access key ID', '(?:AKIA|ASIA)[A-Z\\d]{16}'),
+  // AWS key IDs are uppercase letters and digits, so anything else bounds them, as in AKIA…_backup.csv.
+  {
+    kind: 'aws-access-key-id',
+    reason: 'AWS access key ID',
+    pattern: /(?:(?<![A-Z\d\\%])|(?<=%[\dA-Fa-f]{2}))(?:AKIA|ASIA)[A-Z\d]{16}(?![A-Z\d])/g,
+  },
   format('github-token', 'GitHub token', 'gh[pousr]_[A-Za-z\\d]{36,255}|github_pat_[A-Za-z\\d_]{80,255}'),
   format('stripe-key', 'Stripe secret key', '(?:(?:sk|rk)_(?:live|test)_|whsec_)[A-Za-z\\d]{16,255}'),
   format('slack-token', 'Slack token', '(?:xox[abposre]|xapp)-[A-Za-z\\d-]{10,255}'),
