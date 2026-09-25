@@ -1,5 +1,5 @@
 import { Rule } from '../../types';
-import { kindFromName } from '../names';
+import { kindFromName } from '../shared';
 
 // A key, optionally quoted or written as a --flag, then an assignment: = : := or =>. An = followed by
 // another = is a comparison, and a name right after ${ is a shell default such as ${TOKEN:-unset}.

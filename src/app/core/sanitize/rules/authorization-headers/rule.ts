@@ -1,5 +1,5 @@
 import { Finding, Rule } from '../../types';
-import { kindFromName } from '../names';
+import { kindFromName, looksLikeCredential } from '../shared';
 
 // A header name, optionally quoted as a JSON or Python key, then a colon and an optional opening quote.
 // It matches only up to the value, so the next header on the same line is still found. A colon followed
@@ -78,12 +78,6 @@ function curlBearers(text: string): Finding[] {
 function credential(text: string, at: number, kind: string, reason: string, accept = (_: string) => true): Finding[] {
   const value = matchAt(CREDENTIAL, text, at);
   return value && accept(value) ? [{ start: at, end: at + value.length, kind, reason }] : [];
-}
-
-// A lone word after "Authorization:" is only a credential if it looks like one, so log prose such as
-// "Authorization: denied for usr_034" stays.
-function looksLikeCredential(value: string): boolean {
-  return (value.length >= 8 && /\d/.test(value)) || value.length >= 20;
 }
 
 function matchAt(pattern: RegExp, text: string, at: number): string | undefined {
