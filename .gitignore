@@ -1,3 +1,17 @@
+# Build output
+/dist
+/out-tsc
+/.angular
+/coverage
+
+# Dependencies
+/node_modules
+npm-debug.log
+
+# Editors
+.idea/
+.vscode/
+
 # Local tool output
 .playwright-mcp/
 
