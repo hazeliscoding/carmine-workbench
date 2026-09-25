@@ -19,9 +19,11 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - **HTTP crates** are checked with `cargo tree` for the three desktop targets. `Cargo.lock` also lists crates for mobile, where tauri pulls in `reqwest`, so scanning it gives false positives.
 - **CI** builds on Linux only until the M2 release workflow adds Windows and macOS.
 - **The engine scans raw text.** It doesn't detect or parse formats, because real pastes mix curl, headers, logs and cut-off JSON. Output bytes stay the same outside the removed values, and the input's line endings are kept.
-- **Overlaps:** format rules (`jwt`, `private-keys`, `known-secret-formats`) outrank context rules (headers, cookies, parameters, keys), and then the longer span wins. An overlapping finding merges into the winner, and the union of both spans is replaced under the winner's label.
+- **Overlaps:** format rules (`jwt`, `private-keys`, `known-secret-formats`) outrank context rules (headers, cookies, parameters, keys), and then the longer span wins. An overlapping finding merges into the winner, and the union of both spans is replaced under the winner's label. When it overlaps several, each keeps its label, and any letters or digits between them go to a neighbour.
 - **Labels** are numbered across all kinds in order of first appearance. A label belongs to the value, whichever rule found it. Every other copy of a removed value of 8 or more characters gets the same label, even where no rule matches.
 - **Kept on purpose:** references (`$TOKEN`, `{{token}}`, `<token>`, `***`, existing labels), plain cookie values under 8 characters (`theme=dark`), `token_type`, pagination tokens and Stripe `pk_` keys. Sanitizing twice changes nothing.
+- **Where a name alone isn't proof, the value must look like a credential.** Examples are header names such as `token`, a bare word after `Authorization:`, `Bearer` outside a header, and generic parameters such as `code`, `auth` and `sig`. Code that reads a secret (`await getToken()`, `password: string`) is left alone. Values under sensitive key names such as `password` are always removed.
+- **Performance:** the engine and rules stay linear, because M2 sanitizes as you type. A test holds a 1 MB input under 3 s; it takes about 0.3 s.
 - **Fake secrets** are built at test time. Fixture inputs write every secret as `{{secret:…}}` or `{{fake:<format>}}`. GitHub's partner scanning of public repos can't be scoped, so an allowlist would only hide the alerts here while vendors still got notified.
 - **Claims:** the engine returns the decoded claims. Writing the claims block into the copied output is M2, along with its toggle.
 
@@ -45,11 +47,11 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 
 ## M1: Sanitize engine
 
-- [ ] Engine: runs all rules, resolves overlaps (the most specific finding wins), assigns labels, and returns the output plus a change list.
-- [ ] Rule contract: one folder per rule, containing `rule.ts` (findings with position, kind and reason) and `fixtures/` (input and expected-output pairs).
-- [ ] Fixture runner, plus a **no-leak check**: no secret value from a fixture may appear in its output. Also check that every removed value is declared, and that sanitizing a second time changes nothing.
-- [ ] Keep fake secrets in fixtures from tripping GitHub secret scanning by building them at test time from placeholders.
-- [ ] The seven rules:
+- [x] Engine: runs all rules, resolves overlaps (the most specific finding wins), assigns labels, and returns the output plus a change list.
+- [x] Rule contract: one folder per rule, containing `rule.ts` (findings with position, kind and reason) and `fixtures/` (input and expected-output pairs).
+- [x] Fixture runner, plus a **no-leak check**: no secret value from a fixture may appear in its output. Also check that every removed value is declared, and that sanitizing a second time changes nothing.
+- [x] Keep fake secrets in fixtures from tripping GitHub secret scanning by building them at test time from placeholders.
+- [x] The seven rules:
 
 | Rule | Covers |
 |---|---|
@@ -83,9 +85,10 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - [ ] `CONTRIBUTING.md`: how to add a rule in one folder, with a rule template.
 - [ ] `SECURITY.md`, plus a privacy contract document that lists each promise and how it is enforced.
 - [ ] A "Missed a secret" issue template. It asks for the format, never the real value.
-- [ ] Good-first-issue list of secret formats.
+- [ ] Good-first-issue list of secret formats. Start with the gaps found in the M1 review: XML (`<password>`, `<add key="ApiKey" value="…"/>`), `.netrc`, Docker config `auth`, `?key=` for vendors other than Google, `?subscription-key=`, and Google `1//` refresh tokens.
 - [ ] HAR support.
 - [ ] Review flags: leftover high-entropy strings are flagged for review, not silently removed.
+- [ ] Label kinds come from key names, so a secret glued into a name (`AWS_AKIA…_SECRET=…`) shows up inside its label. Fall back to a generic kind when that happens.
 
 ## Later
 
@@ -95,6 +98,8 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 - Signed builds with build provenance
 - Open files or drag and drop them in
 - JWT signature check with a key pasted locally
+- Values split across lines: curl `\` line continuations and folded headers
+- Copies across encodings, such as a value that appears both raw and URL-encoded (`+` and `%2B`), or both inside and outside a Basic header
 
 ## Not planned
 
