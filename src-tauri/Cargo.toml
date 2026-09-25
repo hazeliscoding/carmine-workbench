@@ -1,0 +1,19 @@
+[package]
+name = "carmine-workbench"
+version = "0.0.0"
+description = "Sanitize curl commands, headers, logs and tokens before you share them"
+authors = ["Hazel Granados"]
+license = "Apache-2.0"
+repository = "https://github.com/hazeliscoding/carmine-workbench"
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "carmine_workbench_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "2.11.6", features = [] }

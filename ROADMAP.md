@@ -15,15 +15,15 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (Apache-2.0).
-- [ ] Scaffold Angular + Tauri v2.
-- [ ] Generate the app and installer icons from `docs/brand/mark.svg`. Put the mark on a paper-colored tile, because its dark strokes disappear on a dark taskbar.
+- [x] Scaffold Angular + Tauri v2.
+- [x] Generate the app and installer icons from `docs/brand/mark.svg`. Put the mark on a paper-colored tile, because its dark strokes disappear on a dark taskbar.
 - [ ] Adapt the directive//01 tokens:
   - [ ] Self-host the fonts under OFL licenses (Public Sans, Barlow Semi Condensed, JetBrains Mono) instead of loading Google Fonts.
   - [ ] Drop the Lucide icons loaded from a CDN.
   - [ ] Fix the colors that fail WCAG AA: light `--text-meta` (3.96), light `--amber` (3.35), dark `--directive-red` (3.42) and the dark focus ring (2.49).
 - [ ] Build a static Sanitize screen with a canned sample: findings list, input, sanitized output with diff, JWT panel, and a `LOCAL · NO NETWORK` status bar.
 - [ ] Turn on the privacy guardrails from the first commit:
-  - [ ] a Content Security Policy that blocks outbound connections;
+  - [x] a Content Security Policy that blocks outbound connections;
   - [ ] no HTTP or updater plugins;
   - [ ] a CI check that fails on `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or `sendBeacon` in `src/`, and on HTTP crates in `src-tauri/`.
 - [ ] Add a screenshot to the README.
