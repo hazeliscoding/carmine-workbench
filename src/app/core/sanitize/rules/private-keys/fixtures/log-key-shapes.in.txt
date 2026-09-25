@@ -1,0 +1,8 @@
+ORDERS_SIGNING_KEY="{{fake:private-key-one-line}}"
+07:19:02 {{fake:private-key-logged}}
+{{fake:pgp-private-key}}
+key = ("{{fake:private-key-python}}\n")
+users:
+- name: deploy
+  user:
+    client-key-data: {{fake:private-key-base64}}

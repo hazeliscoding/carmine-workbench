@@ -55,6 +55,23 @@ const FAKES: Record<string, (n: number) => string> = {
   'private-key-yaml': (n) => pem('EC ', n, '\n    '),
   // Pasted without its END line.
   'private-key-truncated': (n) => pem('OPENSSH ', n, '\n', false),
+  // Flattened onto one line, as an env var often is.
+  'private-key-one-line': (n) => pem('', n, ' '),
+  // With a log prefix on every line after the first.
+  'private-key-logged': (n) => pem('RSA ', n, '\n07:19:02 '),
+  // Split across Python string literals that are concatenated.
+  'private-key-python': (n) => pem('', n, '\\n"\n    "'),
+  // A kubeconfig client-key-data value: the whole PEM block in base64.
+  'private-key-base64': (n) => btoa(pem('RSA ', n, '\n')),
+  'pgp-private-key': (n) =>
+    [
+      '-----BEGIN PGP ' + 'PRIVATE KEY BLOCK-----',
+      'Comment: https://gnupg.org',
+      '',
+      ...chars(`pgp${n}`, 300, B64).match(/.{1,64}/g)!,
+      '=' + chars(`crc${n}`, 4, B64),
+      '-----END PGP ' + 'PRIVATE KEY BLOCK-----',
+    ].join('\n'),
   'aws-access-key-id': (n) => 'AK' + 'IA' + chars(`aws${n}`, 16, UPPER + DIGITS),
   'aws-secret-access-key': (n) => chars(`awss${n}`, 40, B64),
   'github-token': (n) => 'gh' + 'p_' + chars(`gh${n}`, 36),

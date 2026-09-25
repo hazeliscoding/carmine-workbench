@@ -1,0 +1,8 @@
+ORDERS_SIGNING_KEY="<private-key#1>"
+07:19:02 <private-key#2>
+<private-key#3>
+key = ("<private-key#4>\n")
+users:
+- name: deploy
+  user:
+    client-key-data: <private-key#5>

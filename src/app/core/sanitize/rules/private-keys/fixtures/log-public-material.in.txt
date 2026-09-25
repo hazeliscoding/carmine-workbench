@@ -5,5 +5,6 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEexampleexampleexampleexampleexampleexample
 MIIBszCCAVmgAwIBAgIUexampleexampleexampleexample
 -----END CERTIFICATE-----
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExampleExampleExampleExampleExample deploy@orders
+client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJzekNDQVZtZ0F3SUJBZ0lVZXhhbXBsZWV4YW1wbGVleGFtcGxlCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
 docs: never paste a "-----BEGIN PRIVATE KEY-----" block into a ticket.
 docs: a key starts with "-----BEGIN RSA PRIVATE KEY-----" and ends with "-----END RSA PRIVATE KEY-----".
