@@ -1,4 +1,5 @@
 import { Finding, Rule } from '../../types';
+import { kindFromName } from '../names';
 
 // A header name, optionally quoted as a JSON or Python key, then a colon and an optional opening quote.
 // It matches only up to the value, so the next header on the same line is still found. A colon followed
@@ -32,7 +33,7 @@ function headers(text: string): Finding[] {
     const at = m.index + m[0].length;
     const reason = `${name} header`;
     if (lower === 'authorization' || lower === 'proxy-authorization') return authorization(text, at, reason);
-    if (KEY_HEADER.test(lower) && !NOT_KEY_HEADER.test(lower)) return credential(text, at, lower.replace(/^x-/, ''), reason);
+    if (KEY_HEADER.test(lower) && !NOT_KEY_HEADER.test(lower)) return credential(text, at, kindFromName(name), reason);
     return [];
   });
 }
