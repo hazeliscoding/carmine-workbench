@@ -1,0 +1,5 @@
+token = get_token_from_environment()
+String token = generateAccessTokenForUser(user);
+log.debug("calling generateAccessTokenForUser for usr_034");
+client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+config.headers.Authorization = await getAuthorizationHeader();

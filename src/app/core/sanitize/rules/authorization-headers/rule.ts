@@ -1,5 +1,5 @@
 import { Finding, Rule } from '../../types';
-import { START, kindFromName, looksLikeCredential } from '../shared';
+import { START, kindFromName, looksLikeCode, looksLikeCredential } from '../shared';
 
 // A header name, optionally quoted as a JSON or Python key (escaped when the JSON sits inside a log
 // string, or a Python b'' string), then a separator and an optional opening quote or Go map bracket. It
@@ -30,7 +30,12 @@ const SCHEME_ANYWHERE = new RegExp(String.raw`${START}(Bearer|Basic)[ \t]+`, 'gi
 // user:password flags of curl and HTTPie (-a, --auth). Short flags take the value attached or after
 // spaces; long ones after = or spaces.
 const CURL_USER = /(?<!\S)(?:(-u|-U|-a)[ \t]*|(--user|--proxy-user|--auth)(?:=|[ \t]+))(["']?)/g;
-// mysql takes its password attached to -p. Other tools use -p for a port, so only mysql and mariadb lines.
+// HTTPie's -a is rsync's archive flag, so only on lines that run http or https.
+const HTTPIE = /(?:^|[\s;|&])https?(?=\s)/;
+// With -A bearer, HTTPie's -a takes a token instead of user:password.
+const HTTPIE_BEARER = /(?:-A|--auth-type)[ \t=]+bearer\b/i;
+// mysql takes its password attached to -p. Other tools use -p for a port, so only mysql and mariadb lines,
+// and never a port mapping such as docker's -p3306:3306.
 const MYSQL_PASSWORD = /(?<!\S)-p(["']?)([^\s'"]+)\1/dg;
 const MYSQL = /\b(?:mysql|mariadb)\w*\b/;
 const CURL_BEARER = /(?<!\S)--oauth2-bearer(?:=|[ \t]+)["']?/g;
@@ -43,8 +48,7 @@ export const authorizationHeaders: Rule = {
 
 function mysqlPasswords(text: string): Finding[] {
   return [...text.matchAll(MYSQL_PASSWORD)].flatMap((m) => {
-    const lineStart = text.lastIndexOf('\n', m.index) + 1;
-    if (!MYSQL.test(text.slice(lineStart, m.index))) return [];
+    if (!MYSQL.test(lineBefore(text, m.index)) || /^\d+(?::\d+)+$/.test(m[2]!)) return [];
     const [start, end] = m.indices![2]!;
     return [{ start, end, kind: 'password', reason: 'mysql -p password' }];
   });
@@ -84,8 +88,9 @@ function headers(text: string): Finding[] {
 
 function authorization(text: string, at: number, reason: string): Finding[] {
   const scheme = matchAt(SCHEME, text, at);
-  if (!scheme) return credential(text, at, 'authorization', reason, looksLikeCredential);
-  const name = scheme.trim().toLowerCase();
+  const name = scheme?.trim().toLowerCase() ?? '';
+  // Authorization = new AuthenticationHeaderValue(…) or = await getHeader() is code, not a scheme.
+  if (!scheme || looksLikeCode(name)) return credential(text, at, 'authorization', reason, looksLikeCredential);
   const rest = at + scheme.length;
   if (PARAM_SCHEME.test(name)) return params(text, rest, name.startsWith('aws4-') ? 'aws-signature' : name, reason);
   if (name === 'token' && matchAt(/token=/iy, text, rest)) return params(text, rest, name, reason);
@@ -102,26 +107,44 @@ function params(text: string, from: number, kind: string, reason: string): Findi
 
 function curlUsers(text: string): Finding[] {
   return [...text.matchAll(CURL_USER)].flatMap((m) => {
+    const flag = m[1] ?? m[2]!;
     const quote = m[3]!;
+    const at = m.index + m[0].length;
+    if (flag === '-a' || flag === '--auth') {
+      const line = lineAround(text, m.index);
+      if (!HTTPIE.test(line)) return [];
+      if (HTTPIE_BEARER.test(line)) return credential(text, at, 'bearer', `${flag} bearer token`);
+    }
     // A colon followed by // is a URL scheme (redis-cli -u redis://host), not user:password.
     const userPass =
       quote === '"' ? /[^":\s]*:(?!\/\/)([^"\r\n]+)/dy : quote === "'" ? /[^':\s]*:(?!\/\/)([^'\r\n]+)/dy : /[^\s:'"]*:(?!\/\/)(\S+)/dy;
-    userPass.lastIndex = m.index + m[0].length;
+    userPass.lastIndex = at;
     const u = userPass.exec(text);
     // docker and ps take -u uid:gid.
     if (!u || /^\d+:\d+$/.test(u[0])) return [];
     const [start, end] = u.indices![1]!;
-    return [{ start, end, kind: 'password', reason: `${m[1] ?? m[2]} password` }];
+    return [{ start, end, kind: 'password', reason: `${flag} password` }];
   });
+}
+
+function lineBefore(text: string, at: number): string {
+  return text.slice(text.lastIndexOf('\n', at - 1) + 1, at);
+}
+
+function lineAround(text: string, at: number): string {
+  const end = text.indexOf('\n', at);
+  return lineBefore(text, at) + text.slice(at, end === -1 ? text.length : end);
 }
 
 function curlBearers(text: string): Finding[] {
   return [...text.matchAll(CURL_BEARER)].flatMap((m) => credential(text, m.index + m[0].length, 'bearer', 'curl --oauth2-bearer'));
 }
 
+// A value followed by ( is a call, as in token = getToken().
 function credential(text: string, at: number, kind: string, reason: string, accept = (_: string) => true): Finding[] {
   const value = matchAt(CREDENTIAL, text, at);
-  return value && accept(value) ? [{ start: at, end: at + value.length, kind, reason }] : [];
+  if (!value || text[at + value.length] === '(' || !accept(value)) return [];
+  return [{ start: at, end: at + value.length, kind, reason }];
 }
 
 function matchAt(pattern: RegExp, text: string, at: number): string | undefined {
