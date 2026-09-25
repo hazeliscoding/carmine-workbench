@@ -76,8 +76,19 @@ describe('sanitize', () => {
     ]);
   });
 
-  it('drops a context finding that overlaps two format findings', () => {
-    expect(sanitize('"secret": "tok_aaaaaaaa tok_bbbbbbbb"', [quoted, token]).output).toBe('"secret": "<token#1> <token#2>"');
+  it('keeps each label when a context finding overlaps two format findings, and removes what lies between', () => {
+    const rules = [quoted, token];
+    const once = sanitize('"secret": "lead9xyz tok_aaaaaaaa|tok_bbbbbbbb|leftover9"', rules).output;
+    expect(once).toBe('"secret": "<token#1>|<token#2>"');
+    expect(sanitize(once, rules).output).toBe(once);
+  });
+
+  it('keeps up with a 1 MB input full of findings', () => {
+    const input = Array.from({ length: 40_000 }, (_, i) => `key=s3cr3t${i.toString(16).padStart(8, '0')}`).join('\n');
+    const started = performance.now();
+    const result = sanitize(input, [kv]);
+    expect(result.changes.length).toBe(40_000);
+    expect(performance.now() - started).toBeLessThan(3000);
   });
 
   it('lets the longer span win between rules of the same rank', () => {
