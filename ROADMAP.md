@@ -26,7 +26,7 @@ Carmine is a local-first desktop app (Angular + Tauri v2) that sanitizes auth an
   - [x] Self-host the fonts under OFL licenses (Public Sans, Barlow Semi Condensed, JetBrains Mono) instead of loading Google Fonts.
   - [x] Drop the Lucide icons loaded from a CDN.
   - [x] Fix the colors that fail WCAG AA: light `--text-meta` (3.96), light `--amber` (3.35), dark `--directive-red` (3.42) and the dark focus ring (2.49).
-- [ ] Build a static Sanitize screen with a canned sample: findings list, input, sanitized output with diff, JWT panel, and a `LOCAL · NO NETWORK` status bar.
+- [x] Build a static Sanitize screen with a canned sample: findings list, input, sanitized output with diff, JWT panel, and a `LOCAL · NO NETWORK` status bar.
 - [ ] Turn on the privacy guardrails from the first commit:
   - [x] a Content Security Policy that blocks outbound connections;
   - [x] no HTTP or updater plugins;

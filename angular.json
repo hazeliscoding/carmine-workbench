@@ -20,6 +20,11 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
+                "glob": "lockup*.svg",
+                "input": "docs/brand",
+                "output": "brand"
+              },
+              {
                 "glob": "LICENSE",
                 "input": "node_modules/@fontsource-variable/public-sans",
                 "output": "licenses/public-sans"

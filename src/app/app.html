@@ -1,0 +1,50 @@
+<div class="shell">
+  <aside class="sidebar" aria-label="Findings">
+    <div class="brand">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="brand/lockup-dark.svg" />
+        <img src="brand/lockup.svg" alt="Carmine Workbench" height="18" />
+      </picture>
+    </div>
+    <app-findings-list [findings]="sample.findings" />
+    <dl class="facts">
+      <div><dt>Network</dt><dd class="label">None</dd></div>
+      <div><dt>Storage</dt><dd class="label">None</dd></div>
+      <div><dt>Version</dt><dd class="mono">{{ version }}</dd></div>
+    </dl>
+  </aside>
+
+  <main class="main">
+    <header class="bar">
+      <h1 class="title">Sanitize</h1>
+      <p class="summary">{{ removed }} secrets removed, review before sharing</p>
+      <span class="badge sample">Sample</span>
+    </header>
+
+    <div class="panes">
+      <section class="pane input" aria-labelledby="input-title">
+        <div class="pane-head">
+          <h2 class="label" id="input-title">Input</h2>
+          <span class="meta mono">{{ inputMeta }}</span>
+        </div>
+        <app-source-view [text]="sample.input" [secrets]="sample.findings" />
+      </section>
+
+      <div class="pane output">
+        <section aria-labelledby="output-title">
+          <div class="pane-head">
+            <h2 class="label" id="output-title">Sanitized</h2>
+            <span class="meta mono">diff</span>
+          </div>
+          <app-diff-view [before]="sample.input" [after]="sample.output" [findings]="sample.findings" />
+        </section>
+        <app-jwt-panel [jwt]="sample.jwt" />
+      </div>
+    </div>
+  </main>
+
+  <footer class="status">
+    <span>LOCAL · NO NETWORK</span>
+    <span class="mono">{{ sample.findings.length }} findings · 1 JWT</span>
+  </footer>
+</div>
