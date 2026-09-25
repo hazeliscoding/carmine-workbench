@@ -5,9 +5,9 @@ import { START, kindFromName, looksLikeCredential } from '../shared';
 // string, or a Python b'' string), then a separator and an optional opening quote or Go map bracket. It
 // matches only up to the value, so the next header on the same line is still found. The separator is a
 // colon, or = and => as in PowerShell and Ruby hashes; := is an assignment in code (token := …). Right
-// after // is a URL's user name (https://x-access-token:…@host), which url-params reads.
+// after :// is a URL's user name (https://x-access-token:…@host), which url-params reads.
 const HEADER = new RegExp(
-  String.raw`${START}(?<!\/\/)(?:[bBrRuUfF]{0,2}(\\?["']))?([A-Za-z][\w-]*)\1[ \t]*(?::(?!=)|=>|=(?![=>]))[ \t]*\[?(?:[bBrRuUfF]{0,2}\\?["'\`])?`,
+  String.raw`${START}(?<!:\/\/)(?:[bBrRuUfF]{0,2}(\\?["']))?([A-Za-z][\w-]*)\1[ \t]*(?::(?!=)|=>|=(?![=>]))[ \t]*\[?(?:[bBrRuUfF]{0,2}\\?["'\`])?`,
   'g',
 );
 // A shell or template reference is taken whole so the engine can skip it; anything else runs up to

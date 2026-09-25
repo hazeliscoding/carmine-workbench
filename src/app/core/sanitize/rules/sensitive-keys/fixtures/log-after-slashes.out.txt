@@ -1,0 +1,3 @@
+//token: <token#1>
+#//password=<password#2>
+GET https://api.example.com//token=<token#3>

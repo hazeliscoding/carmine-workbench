@@ -1,0 +1,3 @@
+//token: {{secret:Qx7mZp2Lk9vR4tW8yE1}}
+#//password={{secret:hunter2-staging}}
+GET https://api.example.com//token={{secret:Qx7mZp2Lk9vR4tW8yE2}}
