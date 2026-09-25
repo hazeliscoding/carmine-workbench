@@ -47,6 +47,25 @@ describe('jwt rule', () => {
     expect(jwt.find(token)[0]?.jwt).toEqual({ header: { alg: 'HS256' }, claims: {} });
   });
 
+  it('takes all five segments of an encrypted token and keeps its claims empty', () => {
+    const token = fake('jwe');
+    expect(jwt.find(`session=${token}; Path=/`).map((f) => [f.start, f.end, f.reason, f.jwt])).toEqual([
+      [8, 8 + token.length, 'JWE', { header: { alg: 'dir', enc: 'A256GCM' }, claims: {} }],
+    ]);
+  });
+
+  it('finds a token right after an escape or a URL-encoded character', () => {
+    const token = fake('jwt');
+    for (const before of ['msg\\t', 'line\\n', 'id_token%3D', '%22']) {
+      expect(jwt.find(`${before}${token}%22`).map((f) => f.end - f.start)).toEqual([token.length]);
+    }
+  });
+
+  it('finds a token glued to a preceding word with a dot', () => {
+    const token = fake('jwt');
+    expect(jwt.find(`orders.example.${token}`).map((f) => [f.start, f.end])).toEqual([[15, 15 + token.length]]);
+  });
+
   it('skips three-part base64url strings whose header has no alg', () => {
     const token = `${b64url('{"typ":"JWT","x":1}')}.${b64url('{"sub":"a"}')}.c2lnbmF0dXJl`;
     expect(jwt.find(token)).toEqual([]);

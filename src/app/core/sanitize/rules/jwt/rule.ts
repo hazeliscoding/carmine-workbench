@@ -1,23 +1,46 @@
-import { DecodedJwt, Rule } from '../../types';
+import { Finding, Rule } from '../../types';
+import { START } from '../shared';
 
-// Three base64url segments; the signature is empty for alg "none". Decoding the header is the real test,
-// so hostnames and version strings that fit this shape are rejected there.
-const CANDIDATE = /(?<![\w-])[\w-]{10,}\.[\w-]{2,}\.[\w-]*/g;
+// Base64url segments joined by dots: three for a signed token (the signature is empty for alg "none"),
+// five for an encrypted one (the key segment is empty for alg "dir"). Decoding the header is the real
+// test, so hostnames and version strings that fit this shape are rejected there.
+const CANDIDATE = new RegExp(String.raw`${START}[\w-]{10,}(?:\.[\w-]*){2,}`, 'g');
 
 export const jwt: Rule = {
   name: 'jwt',
   by: 'format',
-  find: (text) =>
-    [...text.matchAll(CANDIDATE)].flatMap((m) => {
-      const decoded = decode(m[0]);
-      return decoded ? [{ start: m.index, end: m.index + m[0].length, kind: 'jwt', reason: 'JWT', jwt: decoded }] : [];
-    }),
+  find: (text) => [...text.matchAll(CANDIDATE)].flatMap((m) => tokensIn(m[0], m.index)),
 };
 
-function decode(token: string): DecodedJwt | undefined {
-  const [header, claims] = token.split('.').map(parseSegment);
-  if (!isObject(header) || typeof header['alg'] !== 'string') return undefined;
-  return { header, claims: isObject(claims) ? claims : {} };
+// A run of dotted segments can start with something else, such as a hostname glued on with a dot, so each
+// segment gets a turn as the header.
+function tokensIn(run: string, at: number): Finding[] {
+  const parts = run.split('.');
+  const found: Finding[] = [];
+  let offset = at;
+  for (let i = 0; i + 2 < parts.length; ) {
+    const header = parseSegment(parts[i]!);
+    if (!isObject(header) || typeof header['alg'] !== 'string') {
+      offset += parts[i]!.length + 1;
+      i++;
+      continue;
+    }
+    // An encrypted token keeps every segment it has, even when cut short; its payload can't be read.
+    const encrypted = typeof header['enc'] === 'string';
+    const segments = parts.slice(i, i + (encrypted ? 5 : 3));
+    const token = segments.join('.');
+    const claims = encrypted ? {} : parseSegment(parts[i + 1]!);
+    found.push({
+      start: offset,
+      end: offset + token.length,
+      kind: 'jwt',
+      reason: encrypted ? 'JWE' : 'JWT',
+      jwt: { header, claims: isObject(claims) ? claims : {} },
+    });
+    offset += token.length + 1;
+    i += segments.length;
+  }
+  return found;
 }
 
 function parseSegment(segment: string): unknown {

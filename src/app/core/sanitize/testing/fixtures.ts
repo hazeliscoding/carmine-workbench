@@ -45,6 +45,9 @@ function pem(type: string, n: number, newline: string, withEnd = true): string {
 const FAKES: Record<string, (n: number) => string> = {
   jwt: (n) => jwt({ alg: 'RS256', typ: 'JWT', kid: 'orders-2026-09' }, n, chars(`jwt${n}`, 43, B64URL)),
   'jwt-none': (n) => jwt({ alg: 'none', typ: 'JWT' }, n, ''),
+  // Encrypted, with alg "dir" and so an empty key segment, as NextAuth session cookies are.
+  jwe: (n) =>
+    [base64url({ alg: 'dir', enc: 'A256GCM' }), '', chars(`iv${n}`, 16, B64URL), chars(`ct${n}`, 60, B64URL), chars(`tag${n}`, 22, B64URL)].join('.'),
   'private-key': (n) => pem('RSA ', n, '\n'),
   // As it sits inside a JSON string, such as a Google service-account file: newlines escaped as \n.
   'private-key-json': (n) => pem('', n, '\\n'),

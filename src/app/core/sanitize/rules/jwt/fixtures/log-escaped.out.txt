@@ -1,0 +1,5 @@
+{"level":"debug","msg":"auth header was\tBearer\t<jwt#1>"}
+07:19:02 INFO  redirect_uri=https%3A%2F%2Fapp.example.com%2Fcb%3Fid_token%3D<jwt#2>&state=af0ifjsldkj
+07:19:02 INFO  state=%7B%22t%22%3A%22<jwt#3>%22%7D
+{"level":"debug","msg":"session cookie\n<jwt#4>"}
+07:19:03 DEBUG retrying with <jwt#4>
