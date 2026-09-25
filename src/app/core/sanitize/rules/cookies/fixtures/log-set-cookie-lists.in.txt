@@ -1,0 +1,4 @@
+{ 'set-cookie': [ 'a_session={{secret:Qx7mZp2Lk9vR4tW8yD1}}; Path=/; HttpOnly', 'sid={{secret:0a7c3e9b1d5f2e84}}; Path=/' ], 'content-type': 'text/html' }
+cookie: [ 'sid={{secret:9f3e1c7a5b2d8e40}}' ]
+Set-Cookie: a_session={{secret:Qx7mZp2Lk9vR4tW8yD2}}; Expires=Thu, 24 Sep 2026 08:19:00 GMT; Path=/, sid={{secret:0a7c3e9b1d5f2e85}}; Path=/; HttpOnly
+curl -b 'sid={{secret:0a7c3e9b1d5f2e86}}' 'https://app.example.com/export?format=csv&window=86400s'

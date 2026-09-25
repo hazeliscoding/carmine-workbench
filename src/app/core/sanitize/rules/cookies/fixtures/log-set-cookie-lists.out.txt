@@ -1,0 +1,4 @@
+{ 'set-cookie': [ 'a_session=<cookie:a_session#1>; Path=/; HttpOnly', 'sid=<cookie:sid#2>; Path=/' ], 'content-type': 'text/html' }
+cookie: [ 'sid=<cookie:sid#3>' ]
+Set-Cookie: a_session=<cookie:a_session#4>; Expires=Thu, 24 Sep 2026 08:19:00 GMT; Path=/, sid=<cookie:sid#5>; Path=/; HttpOnly
+curl -b 'sid=<cookie:sid#6>' 'https://app.example.com/export?format=csv&window=86400s'
