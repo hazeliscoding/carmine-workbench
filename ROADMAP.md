@@ -125,11 +125,11 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
     - Separators: a no-break space after a header's colon, a scheme or a key. Whitespace around `=` in auth-params. Doubled separators such as `password = = …`.
     - Escapes: JSON's `\/` (PHP) and `&` (Go). A JWT right after `"` or nginx's `\x22`. A `\"` cookie value. Double-escaped JSON. A URL nested URL-encoded inside another (`next=%2Fcb%3Faccess_token%3D…`).
     - Commands: combined short flags (`curl -sSb`, `-su`, `-fsSLu`), Chrome's `^"` cmd escaping, a quoted `mysql -p` password holding a space, and `MySQL` in another case.
-    - Cookies: the scan stops at the first pair it can't read, such as one with no `=`, an empty segment, `@` or `:` in a name, or a space in a value. A name that starts with a digit after a comma reads as an Expires date. Cookie strings without a `Cookie:` header, such as HAR and `document.cookie`.
+    - Cookies: the scan stops at the first pair it can't read, such as one with no `=`, an empty segment, `@` or `:` in a name, or a space in a value. A name that starts with a digit after a comma reads as an Expires date. Cookie strings without a `Cookie:` header, such as `document.cookie`.
     - JWTs: padded segments, a token joined to a word by `-` or `_`, and a token wrapped across lines.
     - Keys:
       - YAML `|2` and `| # comment` blocks, anchors and tags.
-      - `user[password]` form keys, XML elements and attributes, and a value on the next line.
+      - `user[password]` form keys, and a value on the next line.
       - `${VAR:-default}` defaults, numeric passwords after `:`, and dotted values like `correct.horse.battery`.
       - Missing names: `password_confirmation`, `passcode`, `SECRET_KEY_BASE`, `APP_KEY`, `oauth_signature`, and `sig` after `\n`.
     - Private keys:
