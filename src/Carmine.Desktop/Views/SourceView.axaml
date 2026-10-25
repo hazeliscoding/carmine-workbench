@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Carmine.Desktop.ViewModels"
+             xmlns:v="using:Carmine.Desktop.Views"
+             x:Class="Carmine.Desktop.Views.SourceView"
+             x:DataType="vm:MainWindowViewModel">
+  <UserControl.Styles>
+    <Style Selector="ItemsControl.source TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+      <Setter Property="FontSize" Value="12.5" />
+      <Setter Property="LineHeight" Value="20" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+    </Style>
+    <Style Selector="ItemsControl.source TextBlock.text">
+      <Setter Property="Margin" Value="8,0,16,0" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <!-- A Run matches only a child selector from its TextBlock, not a descendant one. -->
+    <Style Selector="TextBlock.marked > Run.hit">
+      <Setter Property="Background" Value="{DynamicResource MarkBg}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+      <Setter Property="TextDecorations">
+        <TextDecorationCollection>
+          <!-- CSS drew this as an inset shadow at the mark's bottom edge, a pixel below the font's underline. -->
+          <TextDecoration Location="Underline" Stroke="{DynamicResource DirectiveRed}"
+                          StrokeThickness="1" StrokeThicknessUnit="Pixel" StrokeOffset="1" StrokeOffsetUnit="Pixel" />
+        </TextDecorationCollection>
+      </Setter>
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer Focusable="True" AutomationProperties.Name="Input">
+    <ItemsControl Classes="source" Margin="0,12" ItemsSource="{Binding Sample.MarkedInput}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:SourceLine">
+          <Grid ColumnDefinitions="40,*">
+            <TextBlock Grid.Column="0" Padding="0,0,10,0" TextAlignment="Right" Text="{Binding Number}"
+                       AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock Grid.Column="1" Classes="text marked"
+                       Inlines="{Binding Parts, Converter={x:Static v:SegmentConverters.Inlines}}"
+                       AutomationProperties.Name="{Binding Text}" />
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,98 @@
+<!-- The global styles of styles.css: page colors and type, the focus outline, labels, mono text and badges. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource SurfacePage}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    <Setter Property="FontFamily" Value="{StaticResource FontOfficial}" />
+    <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+  </Style>
+
+  <!-- :focus-visible. Drawn inside the control, because the regions run to the window's edges. -->
+  <Style Selector="AdornerLayer">
+    <Setter Property="DefaultFocusAdorner">
+      <FocusAdornerTemplate>
+        <Border BorderThickness="2" BorderBrush="{DynamicResource Auburn}" />
+      </FocusAdornerTemplate>
+    </Setter>
+  </Style>
+
+  <!-- Directive voice: condensed labels. The text is written in capitals; Avalonia has no text transform. -->
+  <Style Selector="TextBlock.label">
+    <Setter Property="FontFamily" Value="{StaticResource FontDirective}" />
+    <Setter Property="FontSize" Value="{StaticResource TextXs}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="0.88" />
+    <Setter Property="LineHeight" Value="17" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+  </Style>
+
+  <Style Selector="TextBlock.mono">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+  </Style>
+
+  <!-- 11 px mono beside a label: pane and panel meta, label tags. -->
+  <Style Selector="TextBlock.meta">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+    <Setter Property="FontSize" Value="{StaticResource TextXs}" />
+    <Setter Property="LineHeight" Value="17" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+  </Style>
+  <Style Selector="TextBlock.meta.tag">
+    <Setter Property="Foreground" Value="{DynamicResource TextLink}" />
+  </Style>
+
+  <Style Selector="Border.badge">
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusStandard}" />
+    <Setter Property="Padding" Value="8,1" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.badge > StackPanel">
+    <Setter Property="Orientation" Value="Horizontal" />
+    <Setter Property="Spacing" Value="6" />
+  </Style>
+  <Style Selector="Border.badge Ellipse">
+    <Setter Property="Width" Value="6" />
+    <Setter Property="Height" Value="6" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.badge TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontDirective}" />
+    <Setter Property="FontSize" Value="{StaticResource TextXs}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="0.88" />
+    <Setter Property="LineHeight" Value="17" />
+  </Style>
+  <Style Selector="Border.badge.amber">
+    <Setter Property="BorderBrush" Value="{DynamicResource Amber}" />
+    <Style Selector="^ Ellipse">
+      <Setter Property="Fill" Value="{DynamicResource Amber}" />
+    </Style>
+    <Style Selector="^ TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource Amber}" />
+    </Style>
+  </Style>
+  <Style Selector="Border.badge.red">
+    <Setter Property="BorderBrush" Value="{DynamicResource DirectiveRed}" />
+    <Style Selector="^ Ellipse">
+      <Setter Property="Fill" Value="{DynamicResource DirectiveRed}" />
+    </Style>
+    <Style Selector="^ TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource DirectiveRed}" />
+    </Style>
+  </Style>
+
+  <!-- A pane or panel head: a label and its meta on a 32 px bar. -->
+  <Style Selector="Border.head">
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Line}" />
+  </Style>
+  <Style Selector="Border.head > StackPanel, Border.head > DockPanel > StackPanel">
+    <Setter Property="Orientation" Value="Horizontal" />
+    <Setter Property="Spacing" Value="8" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+</Styles>

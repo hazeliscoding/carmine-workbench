@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Carmine.Desktop.ViewModels"
+             x:Class="Carmine.Desktop.Views.JwtPanel"
+             x:DataType="vm:MainWindowViewModel">
+  <UserControl.Styles>
+    <!-- The h3's 1em margins around its padding: 19 above and 13 below in CSS. 12 lines the rows up with the browser's. -->
+    <Style Selector="TextBlock.group">
+      <Setter Property="Margin" Value="16,19,16,12" />
+    </Style>
+    <!-- Laid out unrounded, as the browser did: rounded, the 27.75 px rows would end the panel 2 px low. -->
+    <Style Selector="ItemsControl.fields">
+      <Setter Property="UseLayoutRounding" Value="False" />
+    </Style>
+    <Style Selector="ItemsControl.fields TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+      <Setter Property="FontSize" Value="12.5" />
+      <Setter Property="LineHeight" Value="18.75" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="ItemsControl.fields TextBlock.value">
+      <Setter Property="Foreground" Value="{DynamicResource Amber}" />
+    </Style>
+    <Style Selector="ItemsControl.fields TextBlock.value.number">
+      <Setter Property="Foreground" Value="{DynamicResource TextLink}" />
+    </Style>
+    <Style Selector="ItemsControl.fields TextBlock.note">
+      <Setter Property="FontFamily" Value="{StaticResource FontOfficial}" />
+      <Setter Property="FontSize" Value="{StaticResource TextMetaSize}" />
+      <Setter Property="LineHeight" Value="18" />
+      <Setter Property="TextAlignment" Value="Right" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+    </Style>
+    <Style Selector="ItemsControl.fields TextBlock.note.alert">
+      <Setter Property="Foreground" Value="{DynamicResource DirectiveRed}" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="vm:Field">
+      <Border Padding="16,4" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="72,*,Auto" ColumnSpacing="12">
+          <TextBlock Grid.Column="0" Text="{Binding Key}" />
+          <TextBlock Grid.Column="1" Classes="value" Classes.number="{Binding IsNumber}" Text="{Binding Value}" />
+          <TextBlock Grid.Column="2" Classes="note" Classes.alert="{Binding Alert}" Text="{Binding Note}" />
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <Border Focusable="True" AutomationProperties.Name="JWT"
+          BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0">
+    <StackPanel>
+      <!-- 33 high: the CSS head adds its border to 32. The bottom padding rounds the centering as the browser did. -->
+      <Border Classes="head" Height="33" Padding="16,0,16,1">
+        <DockPanel>
+          <Border DockPanel.Dock="Right" Classes="badge red" IsVisible="{Binding Sample.Jwt.Expired}">
+            <StackPanel>
+              <Ellipse />
+              <TextBlock Text="EXPIRED" />
+            </StackPanel>
+          </Border>
+          <StackPanel>
+            <TextBlock Classes="label" Text="JWT" AutomationProperties.HeadingLevel="2" />
+            <TextBlock Classes="meta tag" Text="{Binding JwtTag}" />
+            <TextBlock Classes="meta" Text="{Binding JwtMeta}" />
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <TextBlock Classes="label group" Text="HEADER" AutomationProperties.HeadingLevel="3" />
+      <ItemsControl Classes="fields" ItemsSource="{Binding Sample.Jwt.Header}" />
+
+      <TextBlock Classes="label group" Text="CLAIMS" AutomationProperties.HeadingLevel="3" />
+      <ItemsControl Classes="fields" ItemsSource="{Binding Sample.Jwt.Claims}" />
+
+      <TextBlock Margin="16,12" MaxWidth="560" HorizontalAlignment="Left"
+                 FontSize="{StaticResource TextMetaSize}" LineHeight="19" TextWrapping="Wrap"
+                 Foreground="{DynamicResource TextSecondary}"
+                 Text="Decoded, not verified. The signature was removed and never checked." />
+    </StackPanel>
+  </Border>
+</UserControl>

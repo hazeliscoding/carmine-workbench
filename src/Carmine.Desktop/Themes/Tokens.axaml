@@ -1,0 +1,96 @@
+<!--
+  directive//01 tokens, adapted for Carmine: bundled fonts, the theme follows the OS setting, and colors
+  marked "AA" changed to pass WCAG 2.2 AA. ContrastTests checks every pair it lists in both themes.
+  The names are tokens.css's in PascalCase. CSS color-mix() tokens are written out as the mixed color.
+  Leading and tracking are em-relative in CSS, so the styles apply them as absolute values. Line heights are
+  rounded to whole pixels (17.05 becomes 17), because Avalonia rounds each line up and the rounding adds up.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- type -->
+  <FontFamily x:Key="FontOfficial">avares://CarmineWorkbench/Assets/Fonts/PublicSans#Public Sans</FontFamily>
+  <FontFamily x:Key="FontDirective">avares://CarmineWorkbench/Assets/Fonts/BarlowSemiCondensed#Barlow Semi Condensed</FontFamily>
+  <FontFamily x:Key="FontMono">avares://CarmineWorkbench/Assets/Fonts/JetBrainsMono#JetBrains Mono</FontFamily>
+  <x:Double x:Key="TextXs">11</x:Double>
+  <x:Double x:Key="TextMetaSize">12</x:Double>
+  <x:Double x:Key="TextSecondarySize">13</x:Double>
+  <x:Double x:Key="TextBody">14</x:Double>
+  <x:Double x:Key="TextPrimarySize">15</x:Double>
+
+  <!-- borders -->
+  <CornerRadius x:Key="RadiusStandard">2</CornerRadius>
+
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <!-- base: office paper -->
+      <SolidColorBrush x:Key="Paper" Color="#F2EDE2" />
+      <SolidColorBrush x:Key="Ivory" Color="#F8F5EC" />
+      <SolidColorBrush x:Key="Bone" Color="#ECE5D5" />
+      <SolidColorBrush x:Key="Bureau" Color="#E0D8C6" />
+      <SolidColorBrush x:Key="Line" Color="#D3CAB6" />
+      <SolidColorBrush x:Key="LineStrong" Color="#B3A88F" />
+      <SolidColorBrush x:Key="Graphite" Color="#57503F" />
+      <SolidColorBrush x:Key="Ink" Color="#1B1812" />
+      <SolidColorBrush x:Key="InkSoft" Color="#3A352A" />
+
+      <!-- character -->
+      <SolidColorBrush x:Key="Auburn" Color="#7E4A33" />
+      <!-- AA: was #A17B22 -->
+      <SolidColorBrush x:Key="Amber" Color="#7F611B" />
+      <SolidColorBrush x:Key="Wine" Color="#63242C" />
+      <SolidColorBrush x:Key="DirectiveRed" Color="#9E2B2B" />
+      <SolidColorBrush x:Key="Authorized" Color="#4D6B50" />
+
+      <!-- surfaces and text -->
+      <StaticResource x:Key="SurfacePage" ResourceKey="Paper" />
+      <StaticResource x:Key="SurfaceCard" ResourceKey="Ivory" />
+      <StaticResource x:Key="SurfaceInset" ResourceKey="Bone" />
+      <StaticResource x:Key="TextPrimary" ResourceKey="Ink" />
+      <StaticResource x:Key="TextSecondary" ResourceKey="Graphite" />
+      <!-- AA: was #7D7460 -->
+      <SolidColorBrush x:Key="TextMeta" Color="#6C6453" />
+      <SolidColorBrush x:Key="TextInverse" Color="#F0EBDD" />
+      <StaticResource x:Key="TextLink" ResourceKey="Auburn" />
+
+      <!-- sanitize views: DirectiveRed 12% and Authorized 14% over SurfacePage, DirectiveRed 16% over SurfaceInset -->
+      <SolidColorBrush x:Key="DiffDelBg" Color="#E8D6CC" />
+      <SolidColorBrush x:Key="DiffAddBg" Color="#DBDBCE" />
+      <SolidColorBrush x:Key="MarkBg" Color="#E0C7BA" />
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="Paper" Color="#191712" />
+      <SolidColorBrush x:Key="Ivory" Color="#1F1C16" />
+      <SolidColorBrush x:Key="Bone" Color="#26221A" />
+      <SolidColorBrush x:Key="Bureau" Color="#2E2920" />
+      <SolidColorBrush x:Key="Line" Color="#3A352A" />
+      <SolidColorBrush x:Key="LineStrong" Color="#57503F" />
+      <SolidColorBrush x:Key="Graphite" Color="#A89D85" />
+      <SolidColorBrush x:Key="Ink" Color="#E9E2D1" />
+      <SolidColorBrush x:Key="InkSoft" Color="#CFC6B0" />
+
+      <!-- AA: directive//01 kept the light value, a 2.49 focus ring -->
+      <SolidColorBrush x:Key="Auburn" Color="#A76243" />
+      <SolidColorBrush x:Key="Amber" Color="#C09A3E" />
+      <SolidColorBrush x:Key="Wine" Color="#7C3540" />
+      <!-- AA: was #B84740 -->
+      <SolidColorBrush x:Key="DirectiveRed" Color="#C96A64" />
+      <!-- AA: was #6F8A6F -->
+      <SolidColorBrush x:Key="Authorized" Color="#718C71" />
+
+      <StaticResource x:Key="SurfacePage" ResourceKey="Paper" />
+      <StaticResource x:Key="SurfaceCard" ResourceKey="Ivory" />
+      <SolidColorBrush x:Key="SurfaceInset" Color="#15130F" />
+      <StaticResource x:Key="TextPrimary" ResourceKey="Ink" />
+      <StaticResource x:Key="TextSecondary" ResourceKey="Graphite" />
+      <!-- AA: was #8A8271 -->
+      <SolidColorBrush x:Key="TextMeta" Color="#8D8573" />
+      <SolidColorBrush x:Key="TextInverse" Color="#1B1812" />
+      <SolidColorBrush x:Key="TextLink" Color="#C98D63" />
+
+      <SolidColorBrush x:Key="DiffDelBg" Color="#2E211C" />
+      <SolidColorBrush x:Key="DiffAddBg" Color="#25271F" />
+      <SolidColorBrush x:Key="MarkBg" Color="#32211D" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

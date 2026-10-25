@@ -1,8 +1,132 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Carmine.Desktop.ViewModels"
+        xmlns:v="using:Carmine.Desktop.Views"
+        mc:Ignorable="d"
         x:Class="Carmine.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Title="Carmine Workbench"
         Icon="/Assets/app-icon.ico"
         Width="1100"
         Height="720">
+  <Design.DataContext>
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+
+  <Window.Styles>
+    <Style Selector="TextBlock.title">
+      <Setter Property="FontFamily" Value="{StaticResource FontDirective}" />
+      <Setter Property="FontSize" Value="{StaticResource TextBody}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="1.12" />
+      <Setter Property="LineHeight" Value="22" />
+    </Style>
+    <Style Selector="TextBlock.summary">
+      <Setter Property="FontSize" Value="{StaticResource TextMetaSize}" />
+      <Setter Property="LineHeight" Value="19" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+    </Style>
+    <Style Selector="Grid.facts TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource TextXs}" />
+      <Setter Property="LineHeight" Value="18" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+    </Style>
+    <Style Selector="Grid.facts TextBlock:nth-child(2n)">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+    <Style Selector="Border.status TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource TextXs}" />
+      <Setter Property="LineHeight" Value="17" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="*,26" ColumnDefinitions="240,*">
+    <Border Grid.Row="0" Grid.Column="0"
+            Background="{DynamicResource SurfaceCard}"
+            BorderBrush="{DynamicResource Line}"
+            BorderThickness="0,0,1,0">
+      <DockPanel>
+        <Border DockPanel.Dock="Top" Height="44" Padding="16,0"
+                BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1">
+          <Viewbox Height="18" HorizontalAlignment="Left" AutomationProperties.Name="Carmine Workbench">
+            <Canvas Width="351.92" Height="36">
+              <Path Data="{StaticResource LockupJaws}" Stroke="{DynamicResource LockupInk}" StrokeThickness="3.375" />
+              <Path Data="{StaticResource LockupDatum}" Fill="{DynamicResource LockupRed}" />
+              <Path Data="{StaticResource LockupWordmark}" Fill="{DynamicResource LockupInk}" />
+              <Path Data="{StaticResource LockupSlashes}" Fill="{DynamicResource LockupRed}" />
+            </Canvas>
+          </Viewbox>
+        </Border>
+
+        <!-- 16,10,16,4 in CSS, with 17.6 px rows; 18 px rows sit right with a pixel less below. -->
+        <Border DockPanel.Dock="Bottom" Padding="16,10,16,3"
+                BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0">
+          <Grid Classes="facts" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Network" />
+            <TextBlock Grid.Row="0" Grid.Column="1" Classes="label" Text="NONE" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Storage" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Classes="label" Text="NONE" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Version" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Classes="mono" Text="{Binding Version}" />
+          </Grid>
+        </Border>
+
+        <v:FindingsList />
+      </DockPanel>
+    </Border>
+
+    <Grid Grid.Row="0" Grid.Column="1" RowDefinitions="44,*">
+      <Border Grid.Row="0" Padding="16,0" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+          <!-- Placed, not centered: Avalonia sets this face at this size a pixel lower than the browser. -->
+          <TextBlock Grid.Column="0" Classes="title" Text="SANITIZE" VerticalAlignment="Top" Margin="0,9,0,0"
+                     AutomationProperties.HeadingLevel="1" />
+          <TextBlock Grid.Column="1" Classes="summary" Text="{Binding Summary}" VerticalAlignment="Center" />
+          <Border Grid.Column="2" Classes="badge amber">
+            <StackPanel>
+              <Ellipse />
+              <TextBlock Text="SAMPLE" />
+            </StackPanel>
+          </Border>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="1" ColumnDefinitions="*,1.25*">
+        <Border Grid.Column="0" Background="{DynamicResource SurfaceInset}"
+                BorderBrush="{DynamicResource Line}" BorderThickness="0,0,1,0">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Classes="head" Background="{DynamicResource SurfacePage}">
+              <StackPanel>
+                <TextBlock Classes="label" Text="INPUT" AutomationProperties.HeadingLevel="2" />
+                <TextBlock Classes="meta" Text="{Binding InputMeta}" />
+              </StackPanel>
+            </Border>
+            <v:SourceView />
+          </DockPanel>
+        </Border>
+
+        <ScrollViewer Grid.Column="1">
+          <StackPanel>
+            <v:DiffView />
+            <v:JwtPanel />
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="1" Grid.ColumnSpan="2" Classes="status" Padding="16,0"
+            Background="{DynamicResource SurfaceCard}"
+            BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0"
+            AutomationProperties.Name="Status">
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <TextBlock FontFamily="{StaticResource FontDirective}" FontWeight="SemiBold" LetterSpacing="0.77"
+                   Text="LOCAL · IN MEMORY ONLY" />
+        <TextBlock Classes="mono" Text="{Binding Status}" />
+      </StackPanel>
+    </Border>
+  </Grid>
 </Window>

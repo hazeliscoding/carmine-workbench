@@ -3,7 +3,17 @@
              x:Class="Carmine.Desktop.App"
              Name="Carmine Workbench"
              RequestedThemeVariant="Default">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://CarmineWorkbench/Themes/Tokens.axaml" />
+        <ResourceInclude Source="avares://CarmineWorkbench/Themes/Brand.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
   <Application.Styles>
     <FluentTheme />
+    <StyleInclude Source="avares://CarmineWorkbench/Themes/Styles.axaml" />
   </Application.Styles>
 </Application>

@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Carmine.Desktop.ViewModels"
+             x:Class="Carmine.Desktop.Views.FindingsList"
+             x:DataType="vm:MainWindowViewModel">
+  <UserControl.Styles>
+    <Style Selector="ItemsControl.findings TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource TextXs}" />
+      <Setter Property="LineHeight" Value="17" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="ItemsControl.findings TextBlock.n">
+      <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+      <Setter Property="LineHeight" Value="18" />
+    </Style>
+    <Style Selector="ItemsControl.findings TextBlock.kind">
+      <Setter Property="FontFamily" Value="{StaticResource FontDirective}" />
+      <Setter Property="FontSize" Value="{StaticResource TextMetaSize}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="0.84" />
+      <Setter Property="LineHeight" Value="18" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+    <Style Selector="ItemsControl.findings TextBlock.tag">
+      <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextLink}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer Focusable="True" AutomationProperties.Name="Findings">
+    <StackPanel Margin="0,10">
+      <!-- 32 high in CSS. The bottom margin rounds the centering as the browser did. -->
+      <Grid Height="31" Margin="16,0,16,1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+        <TextBlock Grid.Column="0" Classes="label" Text="FINDINGS" VerticalAlignment="Center"
+                   AutomationProperties.HeadingLevel="2" />
+        <Border Grid.Column="1" Height="1" Background="{DynamicResource Line}" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="2" Classes="label" Text="{Binding Findings.Count}" VerticalAlignment="Center" />
+      </Grid>
+
+      <ItemsControl Classes="findings" ItemsSource="{Binding Findings}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:FindingRow">
+            <!-- 18 on the left: the CSS row's transparent 2 px left border, then its padding. -->
+            <Grid Margin="18,6,16,6" ColumnDefinitions="24,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
+              <TextBlock Grid.RowSpan="3" Classes="n" Text="{Binding Number}"
+                         AutomationProperties.AccessibilityView="Raw" />
+              <TextBlock Grid.Column="1" Grid.Row="0" Classes="kind" Text="{Binding Kind}" />
+              <TextBlock Grid.Column="1" Grid.Row="1" Classes="tag" Text="{Binding Tag}" />
+              <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Where}" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

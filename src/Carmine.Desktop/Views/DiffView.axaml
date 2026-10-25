@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Carmine.Desktop.ViewModels"
+             xmlns:v="using:Carmine.Desktop.Views"
+             x:Class="Carmine.Desktop.Views.DiffView"
+             x:DataType="vm:MainWindowViewModel">
+  <UserControl.Styles>
+    <Style Selector="ItemsControl.diff TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+      <Setter Property="FontSize" Value="12.5" />
+      <Setter Property="LineHeight" Value="20" />
+    </Style>
+    <Style Selector="ItemsControl.diff TextBlock.n">
+      <Setter Property="Padding" Value="0,0,8,0" />
+      <Setter Property="TextAlignment" Value="Right" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMeta}" />
+    </Style>
+    <Style Selector="ItemsControl.diff TextBlock.text" x:DataType="vm:DiffLine">
+      <Setter Property="Padding" Value="0,0,16,0" />
+      <Setter Property="AutomationProperties.Name" Value="{Binding Text}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+    </Style>
+
+    <!-- The removed and added lines: their sign and text sit on the diff color, in the primary text color. -->
+    <Style Selector="ItemsControl.diff Grid.del">
+      <Style Selector="^ Border">
+        <Setter Property="Background" Value="{DynamicResource DiffDelBg}" />
+      </Style>
+      <Style Selector="^ TextBlock.sign">
+        <Setter Property="Text" Value="−" />
+      </Style>
+      <Style Selector="^ TextBlock.text" x:DataType="vm:DiffLine">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="AutomationProperties.Name" Value="{Binding Text, StringFormat='Removed: {0}'}" />
+      </Style>
+    </Style>
+    <Style Selector="ItemsControl.diff Grid.add">
+      <Style Selector="^ Border">
+        <Setter Property="Background" Value="{DynamicResource DiffAddBg}" />
+      </Style>
+      <Style Selector="^ TextBlock.sign">
+        <Setter Property="Text" Value="+" />
+      </Style>
+      <Style Selector="^ TextBlock.text" x:DataType="vm:DiffLine">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="AutomationProperties.Name" Value="{Binding Text, StringFormat='Added: {0}'}" />
+      </Style>
+    </Style>
+
+    <!-- A Run matches only a child selector from its TextBlock, so the text carries the line's class too. -->
+    <Style Selector="TextBlock.del > Run.hit">
+      <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+    <Style Selector="TextBlock.add > Run.hit">
+      <Setter Property="Foreground" Value="{DynamicResource TextLink}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+  </UserControl.Styles>
+
+  <Border Focusable="True" AutomationProperties.Name="Sanitized">
+    <StackPanel>
+      <Border Classes="head">
+        <StackPanel>
+          <TextBlock Classes="label" Text="SANITIZED" AutomationProperties.HeadingLevel="2" />
+          <TextBlock Classes="meta" Text="diff" />
+        </StackPanel>
+      </Border>
+
+      <ItemsControl Classes="diff" Margin="0,6" ItemsSource="{Binding Sample.Diff}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:DiffLine">
+            <Grid ColumnDefinitions="36,36,16,*" Classes.del="{Binding IsDel}" Classes.add="{Binding IsAdd}">
+              <Border Grid.Column="2" Grid.ColumnSpan="2" />
+              <TextBlock Grid.Column="0" Classes="n" Text="{Binding A}" AutomationProperties.AccessibilityView="Raw" />
+              <TextBlock Grid.Column="1" Classes="n" Text="{Binding B}" AutomationProperties.AccessibilityView="Raw" />
+              <TextBlock Grid.Column="2" Classes="sign" AutomationProperties.AccessibilityView="Raw" />
+              <TextBlock Grid.Column="3" Classes="text" Classes.del="{Binding IsDel}" Classes.add="{Binding IsAdd}"
+                         Inlines="{Binding Parts, Converter={x:Static v:SegmentConverters.Inlines}}" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </Border>
+</UserControl>

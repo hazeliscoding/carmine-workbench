@@ -4,6 +4,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Carmine.Desktop;
+using Carmine.Desktop.ViewModels;
 using Carmine.Desktop.Views;
 
 namespace Carmine.Screenshots;
@@ -25,7 +26,9 @@ internal static class Program
         foreach (var (theme, name) in new[] { (ThemeVariant.Light, "screenshot-light.png"), (ThemeVariant.Dark, "screenshot-dark.png") })
         {
             Application.Current!.RequestedThemeVariant = theme;
-            var window = new MainWindow();
+
+            // The size of the Angular app's README screenshots, so the two can be compared.
+            var window = new MainWindow { DataContext = new MainWindowViewModel(), Width = 1280, Height = 800 };
             window.Show();
             Settle(TimeSpan.FromSeconds(1));
             var frame = window.CaptureRenderedFrame() ?? throw new InvalidOperationException("No frame was rendered.");
