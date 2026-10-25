@@ -121,6 +121,23 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
   - [ ] Keep the rules linear on one long line: Digest, AWS4 and OAuth parameters, HTTPie `-a`, `mysql -p`. A 200 KB line of Digest headers takes 6.4 s today.
   - [ ] Never give a new value a label number that the input already holds.
   - [ ] Close the leaks a security review found in the M1 engine, each with a fixture: a reference that only starts the value (`{{name}}` or `$(cat f)` followed by the secret), a secret shaped like a reference (`$…`, `%…%`, `<…>`) that looks like a credential, and a URL password holding `/` or `@`.
+  - [ ] Close the leaks the 2026-10-25 parity review found in both engines, each with a fixture:
+    - Separators: a no-break space after a header's colon, a scheme or a key. Whitespace around `=` in auth-params. Doubled separators such as `password = = …`.
+    - Escapes: JSON's `\/` (PHP) and `&` (Go). A JWT right after `"` or nginx's `\x22`. A `\"` cookie value. Double-escaped JSON. A URL nested URL-encoded inside another (`next=%2Fcb%3Faccess_token%3D…`).
+    - Commands: combined short flags (`curl -sSb`, `-su`, `-fsSLu`), Chrome's `^"` cmd escaping, a quoted `mysql -p` password holding a space, and `MySQL` in another case.
+    - Cookies: the scan stops at the first pair it can't read, such as one with no `=`, an empty segment, `@` or `:` in a name, or a space in a value. A name that starts with a digit after a comma reads as an Expires date. Cookie strings without a `Cookie:` header, such as HAR and `document.cookie`.
+    - JWTs: padded segments, a token joined to a word by `-` or `_`, and a token wrapped across lines.
+    - Keys:
+      - YAML `|2` and `| # comment` blocks, anchors and tags.
+      - `user[password]` form keys, XML elements and attributes, and a value on the next line.
+      - `${VAR:-default}` defaults, numeric passwords after `:`, and dotted values like `correct.horse.battery`.
+      - Missing names: `password_confirmation`, `passcode`, `SECRET_KEY_BASE`, `APP_KEY`, `oauth_signature`, and `sig` after `\n`.
+    - Private keys:
+      - Truncated PEM and PGP blocks with headers or a blank line, and truncated ones with a short last line.
+      - One-line PEMs, and base64 PEMs wrapped at 76 columns or not first in a bundle.
+      - RFC 4716 armor.
+      - Slack webhooks with escaped slashes, and `/triggers/` URLs.
+    - The engine: when two different secrets overlap, the tail of the second one stays.
 - [ ] Wire the UI to the engine:
   - [ ] A pure review model in `Carmine.Core/Review`: output offsets, a diff from change positions with unchanged lines folded, findings rows and the summary. It replaces the static screen's canned diff. The purity check covers all of `Carmine.Core`.
   - [ ] Before the UI code lands, the guard also fails on file writes outside the settings file, clipboard reads, and opening URLs, and allows clipboard writes only in the copy service.
