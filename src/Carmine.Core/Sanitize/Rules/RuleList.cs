@@ -10,7 +10,11 @@ namespace Carmine.Core.Sanitize.Rules;
 
 public static class RuleList
 {
-    // Order breaks ties between context findings on the same span: the more specific name wins.
+    /// <summary>The rules <see cref="Engine.Sanitize"/> runs by default.</summary>
+    /// <remarks>
+    /// Order breaks ties between findings of the same <see cref="RuleBy"/> on the same span: the earlier rule
+    /// wins, so the more specific rule comes first.
+    /// </remarks>
     public static IReadOnlyList<Rule> All { get; } =
     [
         JwtRule.Rule,

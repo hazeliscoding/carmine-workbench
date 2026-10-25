@@ -29,6 +29,26 @@ public static partial class Engine
 
     private sealed record Region(int Start, int End, string Value, Hit? Hit);
 
+    /// <summary>Replaces each secret in <paramref name="input"/> with a typed, numbered label such as <c>&lt;jwt#1&gt;</c>.</summary>
+    /// <remarks>
+    /// <para>
+    /// A finding whose whole value only points at a secret, or holds nothing, is kept: <c>$NAME</c>,
+    /// <c>${…}</c>, <c>$(…)</c>, <c>%NAME%</c>, <c>{{…}}</c>, anything in <c>&lt;…&gt;</c> (labels from an earlier
+    /// pass included), a run of <c>*</c>, <c>[REDACTED]</c> and the like, and <c>null</c>, <c>true</c> or
+    /// <c>false</c>. Other forms, such as PowerShell's <c>$env:NAME</c>, are removed.
+    /// </para>
+    /// <para>
+    /// Each <see cref="Change.Value"/> of 8 characters or more is also replaced where it appears again in the
+    /// input, unless that copy overlaps a different removed value.
+    /// </para>
+    /// <para>
+    /// Within one call, one value always gets the same label, so sanitize a document whole rather than line by
+    /// line. Numbers count every distinct value in order of first appearance, across kinds, so
+    /// <c>&lt;jwt#1&gt;</c> can be followed by <c>&lt;cookie:sid#2&gt;</c>.
+    /// </para>
+    /// <para>Pure and thread-safe: it does no I/O and keeps no state between calls.</para>
+    /// </remarks>
+    /// <param name="rules"><see cref="RuleList.All"/> when <see langword="null"/>.</param>
     public static SanitizeResult Sanitize(string input, IReadOnlyList<Rule>? rules = null)
     {
         // Which taken finding (by index) or copy covers each character of the input.
