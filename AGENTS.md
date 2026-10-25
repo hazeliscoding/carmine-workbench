@@ -7,7 +7,6 @@ These are the working rules for agents in this repo. Carmine Workbench is a loca
 - `README.md`: the pitch and the privacy contract.
 - `ROADMAP.md`: decisions already made, the milestones, and what is out of scope. Check it before proposing features. Respect those decisions unless the owner reopens them.
 - Work from the next unchecked item in `ROADMAP.md`. Don't build past the current milestone without asking.
-- Until M1.5 is done, the TypeScript engine in `src/app/core/sanitize/` is the reference: the C# engine must give the same output, byte for byte.
 
 ## The privacy contract (hard rules)
 

@@ -40,7 +40,6 @@ public sealed record Sample(
 {
     // Canned sample for the static screen; M2 builds all of this from the engine's output.
     // Secret values are cut short with … so they are not real secrets and do not match secret scanners.
-    // MarkedInput and Diff are what the Angular screen computed at runtime with text.ts.
     public static Sample Canned { get; } = Build();
 
     private static Sample Build()

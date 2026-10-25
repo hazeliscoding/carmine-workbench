@@ -27,7 +27,6 @@ internal static class Program
         {
             Application.Current!.RequestedThemeVariant = theme;
 
-            // The size of the Angular app's README screenshots, so the two can be compared.
             var window = new MainWindow { DataContext = new MainWindowViewModel(), Width = 1280, Height = 800 };
             window.Show();
             Settle(TimeSpan.FromSeconds(1));

@@ -5,8 +5,7 @@ using Carmine.Core.Sanitize;
 namespace Carmine.Tests.Sanitize;
 
 // Fake secrets are built at test time, so the repo never holds a string that GitHub secret scanning or a
-// vendor's partner program would match. Prefixes are split for the same reason. The values are the ones
-// the TypeScript engine's testing/fixtures.ts built, character for character.
+// vendor's partner program would match. Prefixes are split for the same reason.
 internal static partial class Fakes
 {
     private const string Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

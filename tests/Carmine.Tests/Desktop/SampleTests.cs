@@ -2,7 +2,7 @@ using Carmine.Desktop.ViewModels;
 
 namespace Carmine.Tests.Desktop;
 
-// The canned sample's diff and marks are written out by hand, where the Angular screen computed them.
+// The canned sample's diff and marks are written out by hand until M2 builds them from the engine's output.
 public class SampleTests
 {
     private static readonly Sample Sample = Sample.Canned;
@@ -34,7 +34,7 @@ public class SampleTests
     }
 
     [Fact]
-    public void The_screen_text_matches_the_Angular_screen()
+    public void The_screen_text_describes_the_sample()
     {
         var model = new MainWindowViewModel();
         Assert.Equal("3 secrets removed, review before sharing", model.Summary);
