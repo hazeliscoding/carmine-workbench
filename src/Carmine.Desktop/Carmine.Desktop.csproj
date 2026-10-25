@@ -7,6 +7,7 @@
     <!-- Shown by Windows as the file description, e.g. in Task Manager. -->
     <AssemblyTitle>Carmine Workbench</AssemblyTitle>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\docs\brand\app-icon.ico</ApplicationIcon>
     <PublishAot>true</PublishAot>
     <!-- Avoids a hard dependency on ICU, which minimal Linux installs and AppImage hosts may lack. -->
     <InvariantGlobalization>true</InvariantGlobalization>
@@ -16,6 +17,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\Fonts\**\*.ttf;Assets\Fonts\**\OFL.txt" />
+    <AvaloniaResource Include="..\..\docs\brand\app-icon.ico" Link="Assets\app-icon.ico" />
   </ItemGroup>
 
   <ItemGroup>

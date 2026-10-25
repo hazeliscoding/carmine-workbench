@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Carmine.Desktop.Views.MainWindow"
         Title="Carmine Workbench"
+        Icon="/Assets/app-icon.ico"
         Width="1100"
         Height="720">
 </Window>
