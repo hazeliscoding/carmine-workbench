@@ -15,6 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AvaloniaResource Include="Assets\Fonts\**\*.ttf;Assets\Fonts\**\OFL.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Carmine.Core\Carmine.Core.csproj" />
   </ItemGroup>
 
