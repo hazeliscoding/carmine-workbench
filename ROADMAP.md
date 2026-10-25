@@ -23,7 +23,7 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 - **Labels** are numbered across all kinds in order of first appearance. A label belongs to the value, whichever rule found it. Every other copy of a removed value of 8 or more characters gets the same label, even where no rule matches.
 - **Kept on purpose:** references (`$TOKEN`, `{{token}}`, `<token>`, `***`, existing labels), plain cookie values under 8 characters (`theme=dark`), `token_type`, pagination tokens and Stripe `pk_` keys. Sanitizing twice changes nothing.
 - **Where a name alone isn't proof, the value must look like a credential.** Examples are header names such as `token`, a bare word after `Authorization:`, `Bearer` outside a header, and generic parameters such as `code`, `auth` and `sig`. Code that reads a secret (`await getToken()`, `password: string`) is left alone. Values under sensitive key names such as `password` are always removed.
-- **Performance:** the engine and rules stay linear, because M2 sanitizes as you type. A test holds a 1 MB input under 3 s; it takes about 0.3 s.
+- **Performance:** the engine and rules stay linear, because M2 sanitizes as you type. A test holds a 1 MB input under 3 s; it takes about 0.3 s. *2026-10-25: through all seven rules, the C# engine takes 0.3 to 0.5 s on that input, against 0.08 s in V8.*
 - **Fake secrets** are built at test time. Fixture inputs write every secret as `{{secret:…}}` or `{{fake:<format>}}`. GitHub's partner scanning of public repos can't be scoped, so an allowlist would only hide the alerts here while vendors still got notified.
 - **Claims:** the engine returns the decoded claims. Writing the claims block into the copied output is M2, along with its toggle.
 - **Input** is a native textarea. Removed values are marked only in the diff, which is built from change positions, not by matching values. Input marks or CodeMirror come back only if the dogfooding log asks for them. *Superseded in part 2026-10-24: the input is an Avalonia TextBox, and AvaloniaEdit takes CodeMirror's place.*
@@ -50,6 +50,14 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 - **The checks are tests.** The network guard, the engine's purity check and the contrast check run in `Carmine.Tests`, each with its positive control, so CI needs no Node. The network guard fails on network APIs outside the updater's file, and on any package in the app's dependency graph that isn't on its allowlist.
 - **Fonts** stay the same three OFL families, bundled as static TTF files from each family's own releases. Avalonia reads neither WOFF2 nor variable fonts, which is what Fontsource ships.
 - **The status bar says `LOCAL · IN MEMORY ONLY`** instead of `LOCAL · NO NETWORK`, which the update check would make untrue.
+
+## Decisions (2026-10-25)
+
+- **Avalonia's build telemetry is off.** Avalonia 12 pulls in Avalonia.BuildServices, which sends usage data from every build. An empty `AvaloniaStats` target in `Directory.Build.targets` replaces its target, CI also sets `AVALONIA_TELEMETRY_OPTOUT`, and a test fails if the override stops winning. It sends from the build machine, not the app, but a privacy tool shouldn't send anything its contributors didn't choose. This gives up Avalonia's usage data from this repo; their README asks for support in other ways instead.
+- **The app project names no runtime identifiers.** A plain restore already carries every platform's native libraries, and NativeAOT can't build for another OS, so each platform publishes on its own runner, as in Prompuff and Gil Sweep.
+- **Regexes never use `IgnoreCase`.** Words are spelled as `[Aa]` classes, and whole-value tests run on an ASCII-lowered copy, which is all JavaScript's `i` flag folds. `\w`, `\d`, `\b` and `\s` are spelled out as JavaScript's sets.
+- **The first NativeAOT build** (win-x64) is an 18 MB exe, and 36 MB with its native libraries; the publish folder also holds 172 MB of symbol files. It opened with a 110 MB working set. M2's packaging leaves the symbols and XML docs out.
+- **The network guard scans raw text,** comments and strings included, because stripping comments needs a C# lexer and a mistake there would hide code. A comment that names `Process`, `Socket` or `Ping` gets reworded. P/Invoke is banned everywhere in `src/` until a native call gets a reviewed exception.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -91,11 +99,11 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 
 ## M1.5: Port to .NET and Avalonia
 
-- [ ] Solution: `Carmine.Core`, `Carmine.Desktop`, `Carmine.Tests` and `tools/Carmine.Screenshots`, with central package versions, and NativeAOT for the app.
-- [ ] The engine and the seven rules in C#, with the fixtures moved unchanged and the runner's three checks: no leak, declared, idempotent.
+- [x] Solution: `Carmine.Core`, `Carmine.Desktop`, `Carmine.Tests` and `tools/Carmine.Screenshots`, with central package versions, and NativeAOT for the app.
+- [x] The engine and the seven rules in C#, with the fixtures moved unchanged and the runner's three checks: no leak, declared, idempotent.
 - [ ] Parity: both engines over the fixtures and generated variants. Every difference is fixed or recorded, and each kind of difference found gets a fixture.
-- [ ] Guards as tests, each with a positive control: network APIs only in the updater's file, a package allowlist, the engine's purity, and the contrast pairs.
-- [ ] The static Sanitize screen in Avalonia: the canned sample, the tokens and the bundled fonts, rendered headless to the README screenshots.
+- [x] Guards as tests, each with a positive control: network APIs only in the updater's file, a package allowlist, the engine's purity, and the contrast pairs.
+- [x] The static Sanitize screen in Avalonia: the canned sample, the tokens and the bundled fonts, rendered headless to the README screenshots.
 - [ ] CI on Linux: build, tests, format, a NativeAOT publish that stays open under Xvfb, and the screenshots.
 - [ ] The Angular and Tauri app removed, and `AGENTS.md` and the README updated.
 
@@ -106,6 +114,7 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 - [ ] Engine fixes before sanitizing as you type:
   - [ ] Keep the rules linear on one long line: Digest, AWS4 and OAuth parameters, HTTPie `-a`, `mysql -p`. A 200 KB line of Digest headers takes 6.4 s today.
   - [ ] Never give a new value a label number that the input already holds.
+  - [ ] Close the leaks a security review found in the M1 engine, each with a fixture: a reference that only starts the value (`{{name}}` or `$(cat f)` followed by the secret), a secret shaped like a reference (`$…`, `%…%`, `<…>`) that looks like a credential, and a URL password holding `/` or `@`.
 - [ ] Wire the UI to the engine:
   - [ ] A pure review model in `Carmine.Core/Review`: output offsets, a diff from change positions with unchanged lines folded, findings rows and the summary. It replaces the static screen's canned diff. The purity check covers all of `Carmine.Core`.
   - [ ] Before the UI code lands, the guard also fails on file writes outside the settings file, clipboard reads, and opening URLs, and allows clipboard writes only in the copy service.
@@ -117,10 +126,10 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
   - [ ] alg and kid; iss, sub and aud; exp, iat and nbf in dotted UTC time with relative age;
   - [ ] warnings for `alg: none`, a missing `exp`, lifetimes over 24 h, `exp` in milliseconds, and `nbf` or `iat` in the future;
   - [ ] the label "decoded, not verified".
-- [ ] Claims block in the copied output, with its toggle. The README's before-and-after is regenerated from it.
+- [ ] Claims block in the copied output, with its toggle. The README's before-and-after is regenerated from it. The writer is iterative or caps the depth, because recursion over a deeply nested header overflows .NET's stack, which no catch stops.
 - [ ] Wording never says "clean". It says "4 secrets removed, review before sharing". A test checks every status line.
 - [ ] Input stays in memory only. No history. The clipboard is written only on Copy, and settings hold preferences only.
-- [ ] Updates, as in Prompuff: Velopack checks GitHub Releases when Carmine opens, a found update waits in the window until **Update and Restart**, and a Settings switch turns the check off. The network guard allows this in `Services/Updates.cs` only.
+- [ ] Updates, as in Prompuff: Velopack checks GitHub Releases when Carmine opens, a found update waits in the window until **Update and Restart**, and a Settings switch turns the check off. The network guard allows this in `Services/Updates.cs` only, and Velopack and its packages join the allowlist. The sidebar's `Network NONE` then names the one request.
 - [ ] Release workflow: Velopack packages for Windows, macOS and Linux on GitHub Releases, with SHA-256 checksums.
   - [ ] Pack settings: pack ID, icons, app metadata and the third-party notices. The Windows Setup is signed in a job of its own; macOS gets the ad-hoc signature.
   - [ ] Windows acceptance probe: paste, check and copy through UI Automation against the installed draft, then scan the disk for a planted value.
@@ -134,7 +143,7 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 ## M3: v0.2, ready for contributors
 
 - [ ] `CONTRIBUTING.md`: how to add a rule in one folder, with a rule template.
-- [ ] `SECURITY.md`, plus a privacy contract document that lists each promise and how it is enforced. It also names what happens outside the app's control: Windows clipboard history, Windows Error Reporting, and crash handlers on Linux and macOS.
+- [ ] `SECURITY.md`, plus a privacy contract document that lists each promise and how it is enforced. It also names what happens outside the app's control: Windows clipboard history, Windows Error Reporting, crash handlers on Linux and macOS, and on Linux the local D-Bus services that can see input text (the AT-SPI accessibility bus and input methods), along with a session bus set up over TCP.
 - [ ] A "Missed a secret" issue template. It asks for the format, never the real value.
 - [ ] Good-first-issue list of secret formats. Start with the gaps found in the M1 review: XML (`<password>`, `<add key="ApiKey" value="…"/>`), `.netrc`, Docker config `auth`, `?key=` for vendors other than Google, `?subscription-key=`, and Google `1//` refresh tokens. Then AI provider keys, which coding agents and AI chats see most: Anthropic `sk-ant-`, OpenAI `sk-proj-`, `sk-svcacct-` and `sk-admin-`, OpenRouter `sk-or-v1-`, Hugging Face `hf_`, Perplexity `pplx-`, Replicate `r8_` and Supabase `sb_secret_` (keeping `sb_publishable_`, as Stripe `pk_` is kept). Also an MCP config whose flag and value are separate `args` items.
 - [ ] HAR support.
