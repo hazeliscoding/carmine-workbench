@@ -137,7 +137,9 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
       - One-line PEMs, and base64 PEMs wrapped at 76 columns or not first in a bundle.
       - RFC 4716 armor.
       - Slack webhooks with escaped slashes, and `/triggers/` URLs.
-    - The engine: when two different secrets overlap, the tail of the second one stays.
+    - The engine:
+      - When two different secrets overlap, the tail of the second one stays.
+      - A value found inside a wider finding isn't replaced where it appears again. In `password="Bearer …"`, the token stays on a later line.
 - [ ] Wire the UI to the engine:
   - [ ] A pure review model in `Carmine.Core/Review`: output offsets, a diff from change positions with unchanged lines folded, findings rows and the summary. It replaces the static screen's canned diff. The purity check covers all of `Carmine.Core`.
   - [ ] Before the UI code lands, the guard also fails on file writes outside the settings file, clipboard reads, and opening URLs, and allows clipboard writes only in the copy service.
