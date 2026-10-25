@@ -110,8 +110,8 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 - [x] Parity: both engines over the fixtures and generated variants. Every difference is fixed or recorded, and each kind of difference found gets a fixture. *2026-10-25: no difference comes from the port; the three that remain are recorded under the decisions.*
 - [x] Guards as tests, each with a positive control: network APIs only in the updater's file, a package allowlist, the engine's purity, and the contrast pairs.
 - [x] The static Sanitize screen in Avalonia: the canned sample, the tokens and the bundled fonts, rendered headless to the README screenshots.
-- [ ] CI on Linux: build, tests, format, a NativeAOT publish that stays open under Xvfb, and the screenshots.
-- [ ] The Angular and Tauri app removed, and `AGENTS.md` and the README updated.
+- [x] CI on Linux: build, tests, format, a NativeAOT publish that stays open under Xvfb, and the screenshots.
+- [x] The Angular and Tauri app removed, and `AGENTS.md` and the README updated.
 
 **Done when:** every fixture passes byte for byte in C#, the parity run finds no difference that isn't recorded, the 1 MB test holds, CI is green, and a NativeAOT build opens the Sanitize screen.
 
