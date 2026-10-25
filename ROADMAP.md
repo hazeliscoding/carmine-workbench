@@ -159,7 +159,7 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
   - [ ] AppImage smoke test under Xvfb in CI, and a macOS launch check.
   - [ ] An update check workflow, as in Prompuff: the previous release finds the new one on all three platforms.
   - [ ] The workflow itself, with its actions pinned by SHA.
-  - [ ] Version 0.1.0, and a README with install steps, notes on the unsigned macOS build and screenshots of the live app.
+  - [ ] Version 0.1.0, and a README with install steps, notes on the unsigned macOS build and screenshots of the live app. Also a GIF of about 5 seconds: paste a curl command, watch the labels appear, copy. The screenshots tool renders its frames headless from the fake sample and ffmpeg encodes them, so it is regenerated like the PNGs and adds no package.
 
 **Done when:** in a released build, you can paste a curl command, see its secrets removed, and copy the result. The Windows probe checks this against the draft release before it is published.
 
