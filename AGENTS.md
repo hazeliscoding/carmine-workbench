@@ -13,7 +13,7 @@ These are the working rules for agents in this repo. Carmine Workbench is a loca
 
 The product's promise is only as good as these rules. Never break them, not even in dev tooling that ships.
 
-- **One network call, for updates.** Velopack's update check against GitHub Releases, in `src/Carmine.Desktop/Services/Updates.cs`, is the only network code. Nothing else may use `HttpClient`, sockets, `WebRequest`, DNS or a WebSocket, or open a URL. The check never carries input. A package that can reach the network is never added, Velopack aside.
+- **One network call, for updates.** Velopack's update check against GitHub Releases, in `src/Carmine.Desktop/Services/Updates.cs`, is the only network code. Nothing else may use `HttpClient`, sockets, `WebRequest`, DNS or a WebSocket, or open a URL. The check never carries input. A package that can reach the network is never added, Velopack aside. `NetworkGuardTests` scans raw text, comments included, so reword a comment that names `Process`, `Socket` or `Ping`. P/Invoke is banned in `src/` until a native call gets a reviewed exception.
 - **No remote assets.** Fonts and icons are bundled. Nothing loads from a CDN or a font service.
 - **No persistence of input.** No history, telemetry or crash reporting. Settings hold preferences, never input. Write to the clipboard only when the user explicitly copies, and never read it.
 - **No real secrets anywhere.** That covers fixtures, tests, issues, commits and docs. Build fake secrets so that GitHub secret scanning doesn't match them, for example by assembling them at test time or cutting them short with `…`.
@@ -30,7 +30,8 @@ The product's promise is only as good as these rules. Never break them, not even
   - **Idempotent:** sanitizing the output again must change nothing.
 - A removed value becomes a typed, numbered label (`<jwt#1>`, `<cookie:sid#3>`), and the label stays the same within one document.
 - For JWTs, replace the whole token and always drop the signature. The claims go to the Explain panel and to the copied output.
-- Regexes are `[GeneratedRegex]`, so NativeAOT gets compiled matchers. .NET regexes differ from JavaScript's, so spell classes out: `\w` and `\d` match letters and digits in every script, `\s` includes NEL (U+0085), `.` matches CR, and `IgnoreCase` lets `k` match `K` (the Kelvin sign). Use `RegexOptions.CultureInvariant` with `IgnoreCase`.
+- Cases that test the engine rather than one rule live in `Sanitize/fixtures/` and run as `engine/<case>`.
+- Regexes are `[GeneratedRegex]`, so NativeAOT gets compiled matchers. .NET regexes differ from JavaScript's, so spell classes out: `\w` and `\d` match letters and digits in every script, `\s` includes NEL (U+0085), and `.` matches CR. Use `Shared.Space` for whitespace. Never use `IgnoreCase`, which lets `k` match `K` (the Kelvin sign): write `[Aa]` classes, or compare an ASCII-lowered copy.
 - Line endings are normalized to LF (`.gitattributes`), and fixtures are compared byte-for-byte. A raw HTTP case that has to keep CRLF is named `*.crlf.in.txt` / `*.crlf.out.txt`, and `.gitattributes` keeps its bytes.
 
 ## UI and copy
