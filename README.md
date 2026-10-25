@@ -9,7 +9,7 @@
 
 When an integration breaks, you paste curl commands, headers, logs and tokens into tickets, chats and vendor support portals. That is how credentials leak. In 2023, attackers took HAR files from Okta's support system and used the session tokens inside them against Okta's customers.
 
-Carmine removes what grants access, keeps what helps debugging, and shows you every change. It has no networking code.
+Carmine removes what grants access, keeps what helps debugging, and shows you every change. Nothing you paste leaves your computer.
 
 > **Status:** early development. The screen below shows a canned sample, and there is nothing to install yet. See [ROADMAP.md](ROADMAP.md).
 
@@ -48,8 +48,8 @@ curl https://api.example.com/v1/orders \
 
 ## The privacy contract
 
-- **No network.** There is no networking code and no auto-updater. The app's Content Security Policy blocks outbound connections, and CI rejects network calls.
-- **Nothing kept.** Input stays in memory only. There is no history and no telemetry.
+- **One request, for updates.** An installed copy asks GitHub Releases for a newer version when it opens, and a switch in Settings turns that off. The request carries nothing you paste. There is no other networking code, and CI rejects any.
+- **Nothing kept.** Input stays in memory only. There is no history and no telemetry, and settings hold preferences, never input.
 - **Open source**, so you can check all of this instead of trusting it.
 
 ## Contributing
