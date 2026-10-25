@@ -2,46 +2,73 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, rewrite/avalonia]
   pull_request:
 
 permissions:
   contents: read
 
-jobs:
-  checks:
-    name: Checks
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-      - name: Positive controls
-        run: node --test "scripts/*.test.mjs"
-      - name: Network guard
-        run: node scripts/check-network.mjs
-      - name: Contrast check
-        run: node scripts/check-contrast.mjs
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
   build:
-    name: Build
+    name: Build, test and smoke-test
     runs-on: ubuntu-24.04
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      AVALONIA_TELEMETRY_OPTOUT: true
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 24
-          cache: npm
-      - name: Install Tauri system dependencies
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Carmine.slnx
+
+      - name: Build
+        run: dotnet build Carmine.slnx --configuration Release --no-restore
+
+      # The privacy guards are tests: network APIs outside the updater, the package allowlist and the engine's purity.
+      - name: Test
+        run: dotnet test --project tests/Carmine.Tests --configuration Release --no-build
+
+      - name: Format
+        run: dotnet format Carmine.slnx --verify-no-changes --no-restore
+
+      # Renders every screen headless; a crash or a broken binding fails the build.
+      - name: Screenshots
+        run: dotnet run --project tools/Carmine.Screenshots --configuration Release --no-build -- artifacts/screenshots
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: screenshots
+          path: artifacts/screenshots
+          retention-days: 7
+
+      # NativeAOT links with clang and zlib.
+      - name: Install NativeAOT and Xvfb prerequisites
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libxdo-dev libayatana-appindicator3-dev librsvg2-dev
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
-      - run: npm ci
-      - run: npm test -- --watch=false
-      - name: Build app
-        run: npm run tauri build -- --no-bundle
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang zlib1g-dev xvfb > /dev/null
+
+      - name: Publish (NativeAOT)
+        run: dotnet publish src/Carmine.Desktop --configuration Release --runtime linux-x64 --output artifacts/aot
+
+      # timeout exits with 124 only when it had to stop the app, so anything else means it didn't stay open.
+      # --kill-after keeps an app that ignores SIGTERM from hanging the job.
+      - name: Smoke test under Xvfb
+        run: |
+          status=0
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=5 15 artifacts/aot/CarmineWorkbench || status=$?
+          if [ "$status" -ne 124 ]; then
+            echo "CarmineWorkbench stopped with status $status; 124 would mean it was still running after 15 seconds."
+            exit 1
+          fi
