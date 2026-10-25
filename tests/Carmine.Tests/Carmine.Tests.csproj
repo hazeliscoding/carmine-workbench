@@ -18,9 +18,10 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <!-- The rules' fixture cases, at Rules/<rule>/fixtures/ beside the test assembly. -->
+  <!-- The rules' fixture cases, at Rules/<rule>/fixtures/ beside the test assembly, and the engine's at fixtures/. -->
   <ItemGroup>
     <None Include="..\..\src\Carmine.Core\Sanitize\Rules\**\fixtures\**" LinkBase="Rules" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\Carmine.Core\Sanitize\fixtures\**" LinkBase="fixtures" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
