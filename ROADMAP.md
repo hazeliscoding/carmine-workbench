@@ -58,6 +58,12 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 - **Regexes never use `IgnoreCase`.** Words are spelled as `[Aa]` classes, and whole-value tests run on an ASCII-lowered copy, which is all JavaScript's `i` flag folds. `\w`, `\d`, `\b` and `\s` are spelled out as JavaScript's sets.
 - **The first NativeAOT build** (win-x64) is an 18 MB exe, and 36 MB with its native libraries; the publish folder also holds 172 MB of symbol files. It opened with a 110 MB working set. M2's packaging leaves the symbols and XML docs out.
 - **The network guard scans raw text,** comments and strings included, because stripping comments needs a C# lexer and a mistake there would hide code. A comment that names `Process`, `Socket` or `Ping` gets reworded. P/Invoke is banned everywhere in `src/` until a native call gets a reviewed exception.
+- **Parity with the TypeScript engine holds.** Two runs put both engines through 6.8 million inputs: the fixtures, generated variants and hand-built edge cases. No difference comes from the port, and three are recorded:
+  - Newly assigned letters such as U+A7CE are letters in Node 24 (Unicode 17) but not in .NET 10 (Unicode 16).
+  - TypeScript throws on a single run of about 1.5 to 8.4 million characters, when V8's regex backtrack stack fills up. C# returns a result.
+  - After an earlier parse, Node 24's `JSON.parse` can return a cached key for an escaped one (`\/`, `\"`, `alg`). TypeScript's claims, and whether it finds a token at all, could depend on an earlier paste. C# reads the JSON as written.
+
+  None of them can be a fixture, because an `.out.txt` can't hold an exception or a result that changes from run to run. The test helper also rejects `{{fake:toString}}` and placeholder numbers that `int.Parse` can't read, both of which `fixtures.ts` accepted. No fixture uses either.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -101,7 +107,7 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 
 - [x] Solution: `Carmine.Core`, `Carmine.Desktop`, `Carmine.Tests` and `tools/Carmine.Screenshots`, with central package versions, and NativeAOT for the app.
 - [x] The engine and the seven rules in C#, with the fixtures moved unchanged and the runner's three checks: no leak, declared, idempotent.
-- [ ] Parity: both engines over the fixtures and generated variants. Every difference is fixed or recorded, and each kind of difference found gets a fixture.
+- [x] Parity: both engines over the fixtures and generated variants. Every difference is fixed or recorded, and each kind of difference found gets a fixture. *2026-10-25: no difference comes from the port; the three that remain are recorded under the decisions.*
 - [x] Guards as tests, each with a positive control: network APIs only in the updater's file, a package allowlist, the engine's purity, and the contrast pairs.
 - [x] The static Sanitize screen in Avalonia: the canned sample, the tokens and the bundled fonts, rendered headless to the README screenshots.
 - [ ] CI on Linux: build, tests, format, a NativeAOT publish that stays open under Xvfb, and the screenshots.
