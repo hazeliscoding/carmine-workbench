@@ -2,4 +2,4 @@
 * text=auto eol=lf
 
 # Raw HTTP fixtures keep their CRLF bytes.
-src/app/core/sanitize/**/fixtures/*.crlf.* -text
+src/Carmine.Core/Sanitize/**/fixtures/*.crlf.* -text
