@@ -136,7 +136,7 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 - [ ] `CONTRIBUTING.md`: how to add a rule in one folder, with a rule template.
 - [ ] `SECURITY.md`, plus a privacy contract document that lists each promise and how it is enforced. It also names what happens outside the app's control: Windows clipboard history, Windows Error Reporting, and crash handlers on Linux and macOS.
 - [ ] A "Missed a secret" issue template. It asks for the format, never the real value.
-- [ ] Good-first-issue list of secret formats. Start with the gaps found in the M1 review: XML (`<password>`, `<add key="ApiKey" value="…"/>`), `.netrc`, Docker config `auth`, `?key=` for vendors other than Google, `?subscription-key=`, and Google `1//` refresh tokens.
+- [ ] Good-first-issue list of secret formats. Start with the gaps found in the M1 review: XML (`<password>`, `<add key="ApiKey" value="…"/>`), `.netrc`, Docker config `auth`, `?key=` for vendors other than Google, `?subscription-key=`, and Google `1//` refresh tokens. Then AI provider keys, which coding agents and AI chats see most: Anthropic `sk-ant-`, OpenAI `sk-proj-`, `sk-svcacct-` and `sk-admin-`, OpenRouter `sk-or-v1-`, Hugging Face `hf_`, Perplexity `pplx-`, Replicate `r8_` and Supabase `sb_secret_` (keeping `sb_publishable_`, as Stripe `pk_` is kept). Also an MCP config whose flag and value are separate `args` items.
 - [ ] HAR support.
 - [ ] Review flags: leftover high-entropy strings are flagged for review, not silently removed. That includes readable identifiers and unknown custom claims in the copied claims block, such as `nonce`, `jti` or `pin`.
 - [ ] Package license notices in the bundle, next to the fonts'.
@@ -146,8 +146,15 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 
 - SAML assertions
 - Optional personal-data rules (emails, IPs, names in claims)
-- A CLI on the same engine
-- Signed builds with build provenance
+- A CLI on the same engine: text from stdin or a named file, sanitized text on stdout, the summary on stderr, and `--json` for the changes and claims. It is its own NativeAOT console project, because the app is a GUI program that can't write to a terminal. It fits a pipe into an agent (`npm test 2>&1 | carmine | claude -p "why does this fail"`), and the agent items below build on it.
+- For coding agents, once the CLI exists:
+  - A skill that tells an agent to run `carmine` on logs, curl commands and tokens before posting them to an issue, PR or chat. It only advises, so the README won't call it protection.
+  - `carmine hook` for an agent's PreToolUse event: secrets in what a posting tool is about to send, such as an issue body or an MCP chat message, become labels. A shell command is denied with the findings instead, because a shell reads `<jwt#1>` as a redirection. It waits for a dogfooding-log entry where an agent posted a secret.
+  - `carmine hook` for PostToolUse, where the agent allows it (Claude Code, Copilot CLI, and Cursor for MCP tools): secrets in a tool's output become labels before the model reads them, and JWT claims stay readable. Each agent gets an end-to-end test first, because Claude Code issues report the replacement ignored for Bash.
+  - Agent sessions as input: Claude Code `/export` text and transcript `.jsonl` lines, with fixtures. Sensitive keys in JSON escaped twice, as when a transcript holds a tool's JSON output, are missed today. Carmine reads only what the user pastes or opens; it never looks for transcripts.
+  - A stdio MCP server with one `sanitize_file` tool, if issues ask for it. Agents with a shell can run the CLI instead, and a tool that takes text receives secrets the model has already read. The official C# SDK ships HTTP client code, so it needs the package rule reopened or a hand-written stdio server.
+  - When one of these ships, the README says where Carmine's output goes in that mode: to the agent and its model provider.
+- Build provenance for the release files
 - Open files or drag and drop them in
 - JWT signature check with a key pasted locally
 - Values split across lines: curl `\` line continuations and folded headers
@@ -161,6 +168,12 @@ Carmine is a local-first desktop app (.NET 10 + Avalonia 12) that sanitizes auth
 
 - General utility tools such as JSON formatting, Base64 or UUIDs. DevToys and CyberChef cover these.
 - Scanning repositories for secrets. gitleaks and trufflehog do this.
+- Hooks that only block a prompt or tool call holding a secret. ggshield and SonarQube CLI do this, and no agent lets a prompt hook hand back a sanitized prompt.
+- A proxy between an agent and its model API that masks secrets and restores them in replies. PasteGuard does this, and it needs a listener and a stored mapping.
+- An MCP gateway that filters every tool call. Microsoft's Agent Governance Toolkit covers this.
+- Cleaning agent session histories in place. agentsweep does this offline.
+- Redacting inside AI chat web pages. Browser extensions such as Nightfall's do this.
+- Keeping `.env` files away from an agent. The agent's own deny rules and `dotenvx run --redact` do this.
 - Accounts, sync, telemetry or anything hosted.
 - Automated UI tests on macOS. The only WebDriver route there embeds an HTTP server in the app. *No longer holds 2026-10-24: Avalonia's headless tests need no WebDriver.*
 
