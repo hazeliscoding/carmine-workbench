@@ -3,6 +3,11 @@
 /out-tsc
 /.angular
 /coverage
+bin/
+obj/
+artifacts/
+TestResults/
+*.binlog
 
 # Dependencies
 /node_modules

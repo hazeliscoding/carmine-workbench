@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Carmine.Core/Carmine.Core.csproj" />
+    <Project Path="src/Carmine.Desktop/Carmine.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Carmine.Tests/Carmine.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/Carmine.Screenshots/Carmine.Screenshots.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Carmine.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Carmine.Core\Carmine.Core.csproj" />
+    <ProjectReference Include="..\..\src\Carmine.Desktop\Carmine.Desktop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- The rules' fixture cases, at Rules/<rule>/fixtures/ beside the test assembly. -->
+  <ItemGroup>
+    <None Include="..\..\src\Carmine.Core\Sanitize\Rules\**\fixtures\**" LinkBase="Rules" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
